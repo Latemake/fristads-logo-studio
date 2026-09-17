@@ -18,7 +18,7 @@ try {
   page.on("request", (request) => {
     if (request.url().includes("/api/")) api.push(request.url());
   });
-  await page.goto("http://127.0.0.1:3180/fristads-logo-studio/");
+  await page.goto(process.env.TEST_SITE || "http://127.0.0.1:3180/fristads-logo-studio/");
   const products = JSON.parse(
     await readFile("data/pages-products.json", "utf8"),
   );
