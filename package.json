@@ -1,0 +1,31 @@
+{
+  "name": "fristads-logo-studio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server/index.js",
+    "build": "vite build",
+    "build:pages": "vite build --mode pages",
+    "stage:pages": "npm run build:pages && node scripts/stage-pages.mjs",
+    "start": "node server/index.js --production",
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource-variable/manrope": "^5.3.0",
+    "cheerio": "^1.1.2",
+    "express": "^5.1.0",
+    "jspdf": "^4.2.1",
+    "lucide-react": "^0.468.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "vite": "^6.1.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.51.0",
+    "prettier": "^3.9.6"
+  }
+}

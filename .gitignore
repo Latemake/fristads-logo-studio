@@ -1,0 +1,11 @@
+node_modules/
+dist/
+dist-pages/
+.env
+.env.*
+test-results/
+playwright-report/
+data/imported.json
+data/image-cache/
+data/*.tmp
+data/*.log
