@@ -4,6 +4,15 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:3100",
     headless: true,
+    storageState: {
+      cookies: [],
+      origins: [
+        {
+          origin: "http://localhost:3100",
+          localStorage: [{ name: "logo-studio-language", value: "fi" }],
+        },
+      ],
+    },
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },

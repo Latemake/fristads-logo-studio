@@ -1,3 +1,4 @@
+import { t, getLanguage, setLanguage, productText } from "./i18n.js";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
@@ -65,6 +66,10 @@ import "./style.css";
 
 const NONE = [];
 function App() {
+  const [language, updateLanguage] = useState(getLanguage);
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
   const history = useDesign(),
     { design, current, change, begin, finish } = history;
   const [catalog, setCatalog] = useState([]),
@@ -155,7 +160,7 @@ function App() {
     editLogos((items) => items.filter((l) => l.id !== id));
     if (selected === id) setSelected(null);
     setToast({
-      message: "Logo poistettu.",
+      message: t("Logo poistettu."),
       type: "success",
       undoAfter: current.current,
       restoreSelection: id,
@@ -167,7 +172,7 @@ function App() {
     editLogos([]);
     setSelected(null);
     setToast({
-      message: "Tämän kuvakulman logot poistettu.",
+      message: t("Tämän kuvakulman logot poistettu."),
       type: "success",
       undoAfter: current.current,
     });
@@ -202,7 +207,9 @@ function App() {
   function fail(e) {
     notify(
       e instanceof SyntaxError
-        ? "Tiedostoa ei voitu lukea. Valitse Logo Studiosta tallennettu suunnitelma."
+        ? t(
+            "Tiedostoa ei voitu lukea. Valitse Logo Studiosta tallennettu suunnitelma.",
+          )
         : e.message,
       "error",
     );
@@ -218,22 +225,30 @@ function App() {
         ]);
         if (!response.ok)
           throw Error(
-            "Tuotevalikoimaa ei voitu ladata. Tarkista yhteys ja yritä uudelleen.",
+            t(
+              "Tuotevalikoimaa ei voitu ladata. Tarkista yhteys ja yritä uudelleen.",
+            ),
           );
         const list = validateProducts(await response.json());
         if (!list.length)
-          throw Error("Valikoima on tyhjä. Tarkista palvelimen tuotetiedot.");
+          throw Error(
+            t("Valikoima on tyhjä. Tarkista palvelimen tuotetiedot."),
+          );
         let restored = freshDesign();
         if (stored) {
           try {
             restored = validateDesign(stored);
           } catch {
             notify(
-              "Tallennettua suunnitelmaa ei voitu avata. Alkuperäistä tallennusta ei korvattu.",
+              t(
+                "Tallennettua suunnitelmaa ei voitu avata. Alkuperäistä tallennusta ei korvattu.",
+              ),
               "error",
             );
             setError(
-              "Selaimeen tallennettu suunnitelma on virheellinen. Avaa suunnitelmatiedosto tai aloita uusi suunnitelma.",
+              t(
+                "Selaimeen tallennettu suunnitelma on virheellinen. Avaa suunnitelmatiedosto tai aloita uusi suunnitelma.",
+              ),
             );
             setCatalog(list);
             return;
@@ -242,7 +257,7 @@ function App() {
         const merged = [...(restored.products || []), ...list];
         if (!merged.some((p) => p.id === restored.productId)) {
           notify(
-            "Aiempi vaate puuttuu valikoimasta. Sen logot säilytettiin.",
+            t("Aiempi vaate puuttuu valikoimasta. Sen logot säilytettiin."),
             "error",
           );
           restored.productId = list[0].id;
@@ -267,18 +282,18 @@ function App() {
   useEffect(() => {
     if (!ready) return;
     const revision = ++savedRevision.current;
-    setSaved("Tallennetaan…");
+    setSaved(t("Tallennetaan…"));
     // Queue immediately, so navigation/reload does not discard a debounce timer.
     saveQueue.current = saveQueue.current
       .catch(() => {})
       .then(() => persist(design))
       .then(() => {
         if (revision === savedRevision.current && mounted.current)
-          setSaved("Tallennettu selaimeen");
+          setSaved(t("Tallennettu selaimeen"));
       })
       .catch(() => {
         if (mounted.current)
-          setSaved("Tallennus epäonnistui – lataa suunnitelma");
+          setSaved(t("Tallennus epäonnistui – lataa suunnitelma"));
       });
   }, [design, ready]);
   useEffect(() => {
@@ -394,10 +409,12 @@ function App() {
       (current.current.placements[targetKey] || []).length + amount >
       MAX_LOGOS
     )
-      throw Error("Yhdessä kuvakulmassa voi olla enintään 20 logoa.");
+      throw Error(t("Yhdessä kuvakulmassa voi olla enintään 20 logoa."));
     if (allLogos(current.current).length + amount > MAX_TOTAL_LOGOS)
       throw Error(
-        "Suunnitelmassa voi olla enintään 200 logoa. Aloita uusi suunnitelma.",
+        t(
+          "Suunnitelmassa voi olla enintään 200 logoa. Aloita uusi suunnitelma.",
+        ),
       );
   }
   async function addFiles(files) {
@@ -406,7 +423,8 @@ function App() {
     setBusy("upload");
     try {
       if (!files.length) return;
-      if (files.length > 10) throw Error("Lataa enintään 10 logoa kerrallaan.");
+      if (files.length > 10)
+        throw Error(t("Lataa enintään 10 logoa kerrallaan."));
       checkCapacity(files.length, targetKey);
       const added = [];
       for (const file of [...files])
@@ -427,7 +445,7 @@ function App() {
       checkCapacity(added.length, targetKey);
       editLogos((items) => [...items, ...added], targetKey);
       setSelected(added.at(-1).id);
-      notify("Logo lisätty. Siirrä vetämällä, muuta kokoa kulmasta.");
+      notify(t("Logo lisätty. Siirrä vetämällä, muuta kokoa kulmasta."));
     } catch (e) {
       fail(e);
     } finally {
@@ -449,7 +467,7 @@ function App() {
       });
       editLogos((items) => [...items, added]);
       setSelected(added.id);
-      notify("Logo lisätty tähän kuvakulmaan.");
+      notify(t("Logo lisätty tähän kuvakulmaan."));
     } catch (e) {
       fail(e);
     }
@@ -526,9 +544,9 @@ function App() {
       const blob = await new Promise((resolve) =>
         output.toBlob(resolve, "image/png"),
       );
-      if (!blob) throw Error("Kuvan tallennus epäonnistui.");
+      if (!blob) throw Error(t("Kuvan tallennus epäonnistui."));
       download(blob, `fristads-${product.id}-kuva-${view + 1}.png`);
-      notify("Esikatselu ladattu.");
+      notify(t("Esikatselu ladattu."));
     } catch (e) {
       fail(e);
     } finally {
@@ -541,7 +559,7 @@ function App() {
     try {
       const { exportPdf } = await import("./exportPdf");
       await exportPdf(current.current, products);
-      notify("PDF-yhteenveto ladattu.");
+      notify(t("PDF-yhteenveto ladattu."));
     } catch (e) {
       fail(e);
     } finally {
@@ -563,7 +581,7 @@ function App() {
       new Blob([JSON.stringify(document)], { type: "application/json" }),
       filename(design.title) + ".json",
     );
-    notify("Muokattava suunnitelma ladattu.");
+    notify(t("Muokattava suunnitelma ladattu."));
   }
   async function importProduct(e, productUrl = url) {
     e?.preventDefault();
@@ -577,7 +595,8 @@ function App() {
         signal: AbortSignal.timeout(45000),
       });
       const body = await response.json();
-      if (!response.ok) throw Error(body.error || "Tuotetta ei voitu hakea.");
+      if (!response.ok)
+        throw Error(body.error || t("Tuotetta ei voitu hakea."));
       const [p] = validateProducts([body]);
       setCatalog((items) => [...items.filter((x) => x.id !== p.id), p]);
       change((d) => ({
@@ -591,7 +610,7 @@ function App() {
       setCategory("Kaikki");
       setDialog(null);
       setUrl("");
-      notify("Vaate lisätty valikoimaan.");
+      notify(t("Vaate lisätty valikoimaan."));
     } catch (e) {
       if (dialog?.type !== "import") {
         fail(e);
@@ -599,7 +618,7 @@ function App() {
       }
       setError(
         e.name === "TimeoutError"
-          ? "Tuotteen haku kesti liian kauan. Yritä uudelleen."
+          ? t("Tuotteen haku kesti liian kauan. Yritä uudelleen.")
           : e.message,
       );
     } finally {
@@ -611,7 +630,7 @@ function App() {
     setBusy("open");
     try {
       if (file.size > 80_000_000)
-        throw Error("Suunnitelmatiedosto on liian suuri (enintään 80 Mt).");
+        throw Error(t("Suunnitelmatiedosto on liian suuri (enintään 80 Mt)."));
       const d = validateDesign(JSON.parse(await file.text())),
         merged = [...products, ...(d.products || [])];
       for (const k of [
@@ -622,9 +641,9 @@ function App() {
           p = merged.find((p) => p.id === id);
         if (!p || !p.images[Number(v)])
           throw Error(
-            "Suunnitelmasta puuttuu tuotteen " +
+            t("Suunnitelmasta puuttuu tuotteen ") +
               id +
-              " kuvakulma. Lisää tuote ensin tuotelinkillä.",
+              t(" kuvakulma. Lisää tuote ensin tuotelinkillä."),
           );
       }
       // Decode images before accepting the document, so malformed PNG payloads cannot poison autosave.
@@ -637,7 +656,9 @@ function App() {
       setReady(true);
       setError("");
       notify(
-        "Suunnitelma avattu. Edellisen työn voit palauttaa Kumoa-painikkeella.",
+        t(
+          "Suunnitelma avattu. Edellisen työn voit palauttaa Kumoa-painikkeella.",
+        ),
       );
     } catch (e) {
       fail(e);
@@ -655,7 +676,9 @@ function App() {
       const processed = await removeWhiteBackground(active.src);
       editLogo(processed, id, targetKey);
       notify(
-        "Valkoinen reunatausta poistettu. Voit palauttaa sen Kumoa-painikkeella.",
+        t(
+          "Valkoinen reunatausta poistettu. Voit palauttaa sen Kumoa-painikkeella.",
+        ),
       );
     } catch (e) {
       fail(e);
@@ -693,7 +716,7 @@ function App() {
   const filtered = products.filter(
     (p) =>
       (category === "Kaikki" || p.category === category) &&
-      `${p.name} ${p.id} ${p.color}`
+      `${p.name} ${productText(p.name)} ${p.id} ${p.color} ${productText(p.color)}`
         .toLocaleLowerCase("fi")
         .includes(query.toLocaleLowerCase("fi")),
   );
@@ -720,11 +743,34 @@ function App() {
         <span className="brand-divider" />
         <span className="studio-name">LOGO STUDIO</span>
         <nav>
+          <label className="language-picker">
+            <span className="sr-only">{t("Kieli")}</span>
+            <select
+              aria-label={t("Kieli")}
+              value={language}
+              onChange={(e) => {
+                setLanguage(e.target.value);
+                updateLanguage(e.target.value);
+              }}
+            >
+              <option value="en" lang="en">
+                English
+              </option>
+              <option value="fi" lang="fi">
+                Suomi
+              </option>
+              <option value="sv" lang="sv">
+                Svenska
+              </option>
+            </select>
+            <ChevronDown size={14} aria-hidden="true" />
+          </label>
           <button
             className="text-btn"
             onClick={() => setDialog({ type: "help" })}
           >
-            Ohjeet <ArrowUpRight size={15} />
+            {" " + t("Ohjeet") + " "}
+            <ArrowUpRight size={15} />
           </button>
         </nav>
       </header>
@@ -732,7 +778,8 @@ function App() {
         <div className="page-title">
           <div>
             <h1>
-              Työvaate. <span>Omalla ilmeellä.</span>
+              {" " + t("Työvaate.") + " "}
+              <span>{t("Omalla ilmeellä.")}</span>
             </h1>
           </div>
           <div className="project-actions">
@@ -741,14 +788,16 @@ function App() {
               onClick={() => openFile.current.click()}
               disabled={!!busy}
             >
-              <FolderOpen size={16} /> Avaa suunnitelma
+              <FolderOpen size={16} />
+              {" " + t("Avaa suunnitelma") + " "}
             </button>
             <button
               className="btn"
               disabled={!ready || !!busy}
               onClick={saveDesign}
             >
-              <ArrowDownToLine size={16} /> Tallenna suunnitelma
+              <ArrowDownToLine size={16} />
+              {" " + t("Tallenna suunnitelma") + " "}
             </button>
           </div>
         </div>
@@ -758,12 +807,12 @@ function App() {
               <Layers size={17} />
             </span>
             <label>
-              <span>SUUNNITELMAN NIMI</span>
+              <span>{t("SUUNNITELMAN NIMI")}</span>
               <input
-                aria-label="Suunnitelman nimi"
+                aria-label={t("Suunnitelman nimi")}
                 value={design.title || ""}
                 maxLength={80}
-                placeholder="Oma työvaatemallisto"
+                placeholder={t("Oma työvaatemallisto")}
                 disabled={!ready}
                 onFocus={begin}
                 onBlur={finish}
@@ -775,45 +824,46 @@ function App() {
           </div>
           <span className="save-status">
             <CheckCircle2 size={14} />
-            {saved || "Ladataan työtilaa…"}
+            {t(saved) || t("Ladataan työtilaa…")}
           </span>
           <button
             className="text-btn new-project"
             disabled={!!busy}
             onClick={() => setDialog({ type: "new" })}
           >
-            <Plus size={15} /> Uusi suunnitelma
+            <Plus size={15} />
+            {" " + t("Uusi suunnitelma") + " "}
           </button>
         </div>
         {!ready && error ? (
           <div className="load-error" role="alert">
             <AlertCircle size={24} />
-            <h2>Työtilaa ei voitu avata</h2>
-            <p>{error}</p>
+            <h2>{t("Työtilaa ei voitu avata")}</h2>
+            <p>{t(error)}</p>
             <button className="btn" onClick={() => window.location.reload()}>
-              Yritä uudelleen
+              {" " + t("Yritä uudelleen") + " "}
             </button>
           </div>
         ) : (
           <div className="workspace" aria-busy={!ready}>
-            <aside className="catalog panel" aria-label="Vaatevalikoima">
+            <aside className="catalog panel" aria-label={t("Vaatevalikoima")}>
               <div className="panel-heading">
                 <span className="step">01</span>
-                <h2>Valitse vaate</h2>
+                <h2>{t("Valitse vaate")}</h2>
                 <span className="count">{products.length}</span>
               </div>
               <div className="catalog-tools">
                 <label className="search">
                   <Search size={17} />
                   <input
-                    aria-label="Etsi vaatetta"
-                    placeholder="Nimi tai tuotenumero"
+                    aria-label={t("Etsi vaatetta")}
+                    placeholder={t("Nimi tai tuotenumero")}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                   />
                   {query && (
                     <button
-                      aria-label="Tyhjennä haku"
+                      aria-label={t("Tyhjennä haku")}
                       onClick={() => setQuery("")}
                     >
                       <X size={14} />
@@ -823,13 +873,13 @@ function App() {
                 <div className="filter">
                   <SlidersHorizontal size={15} />
                   <select
-                    aria-label="Tuoteryhmä"
+                    aria-label={t("Tuoteryhmä")}
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                   >
                     {["Kaikki", ...categories].map((c) => (
                       <option key={c} value={c}>
-                        {c} (
+                        {t(c)} (
                         {c === "Kaikki"
                           ? products.length
                           : products.filter((p) => p.category === c).length}
@@ -853,7 +903,7 @@ function App() {
                     <div className="product-photo">
                       <img
                         src={imageSrc(p.images[0])}
-                        alt={p.name}
+                        alt={productText(p.name)}
                         loading="lazy"
                       />
                       {product?.id === p.id && (
@@ -862,12 +912,16 @@ function App() {
                         </span>
                       )}
                     </div>
-                    <span className="product-category">{p.category}</span>
-                    <strong>{p.name}</strong>
-                    <span className="product-color">{p.color || p.id}</span>
+                    <span className="product-category">{t(p.category)}</span>
+                    <strong>{productText(p.name)}</strong>
+                    <span className="product-color">
+                      {productText(p.color) || p.id}
+                    </span>
                     {Object.entries(design.placements).some(
                       ([k, l]) => k.startsWith(p.id + ":") && l.length,
-                    ) && <span className="designed-tag">Logo lisätty</span>}
+                    ) && (
+                      <span className="designed-tag">{t("Logo lisätty")}</span>
+                    )}
                   </button>
                 ))}
                 {!filtered.length && (
@@ -875,8 +929,8 @@ function App() {
                     <Search size={23} />
                     <p>
                       {ready
-                        ? "Hakua vastaavia vaatteita ei löytynyt."
-                        : "Ladataan vaatteita…"}
+                        ? t("Hakua vastaavia vaatteita ei löytynyt.")
+                        : t("Ladataan vaatteita…")}
                     </p>
                     {ready && (
                       <button
@@ -886,7 +940,7 @@ function App() {
                           setCategory("Kaikki");
                         }}
                       >
-                        Näytä kaikki vaatteet
+                        {" " + t("Näytä kaikki vaatteet") + " "}
                       </button>
                     )}
                   </div>
@@ -902,28 +956,34 @@ function App() {
                       setDialog({ type: "import" });
                     }}
                   >
-                    <Link size={15} /> Lisää tuotelinkillä <Plus size={15} />
+                    <Link size={15} />
+                    {" " + t("Lisää tuotelinkillä") + " "}
+                    <Plus size={15} />
                   </button>
                 </div>
               )}
             </aside>
-            <section className="preview panel" aria-label="Esikatselutyötila">
+            <section
+              className="preview panel"
+              aria-label={t("Esikatselutyötila")}
+            >
               <div className="preview-toolbar">
                 <div>
-                  <span className="live-dot" /> OMA ILMEESI
+                  <span className="live-dot" />
+                  {" " + t("OMA ILMEESI") + " "}
                 </div>
                 <div className="toolbar-actions">
                   <button
-                    title="Kumoa (Ctrl+Z)"
-                    aria-label="Kumoa"
+                    title={t("Kumoa (Ctrl+Z)")}
+                    aria-label={t("Kumoa")}
                     disabled={!history.canUndo || !!busy}
                     onClick={history.undo}
                   >
                     <Undo2 size={17} />
                   </button>
                   <button
-                    title="Toista (Ctrl+Shift+Z)"
-                    aria-label="Toista"
+                    title={t("Toista (Ctrl+Shift+Z)")}
+                    aria-label={t("Toista")}
                     disabled={!history.canRedo || !!busy}
                     onClick={history.redo}
                   >
@@ -931,7 +991,7 @@ function App() {
                   </button>
                   <span />
                   <button
-                    aria-label="Pienennä näkymää"
+                    aria-label={t("Pienennä näkymää")}
                     disabled={zoom <= 75}
                     onClick={() => setZoom((z) => z - 25)}
                   >
@@ -939,14 +999,14 @@ function App() {
                   </button>
                   <button
                     className="zoom-label"
-                    title="Palauta näkymä"
-                    aria-label="Palauta näkymä"
+                    title={t("Palauta näkymä")}
+                    aria-label={t("Palauta näkymä")}
                     onClick={() => setZoom(100)}
                   >
                     {zoom}%
                   </button>
                   <button
-                    aria-label="Suurenna näkymää"
+                    aria-label={t("Suurenna näkymää")}
                     disabled={zoom >= 175}
                     onClick={() => setZoom((z) => z + 25)}
                   >
@@ -954,8 +1014,8 @@ function App() {
                   </button>
                   <span />
                   <button
-                    title="Esitysnäkymä"
-                    aria-label="Esitysnäkymä"
+                    title={t("Esitysnäkymä")}
+                    aria-label={t("Esitysnäkymä")}
                     disabled={!garment || !!busy}
                     onClick={showPresentation}
                   >
@@ -988,7 +1048,9 @@ function App() {
                     ref={canvas}
                     width="800"
                     height="800"
-                    aria-label="Vaatteen esikatselu. Siirrä valittua logoa nuolinäppäimillä tai vetämällä."
+                    aria-label={t(
+                      "Vaatteen esikatselu. Siirrä valittua logoa nuolinäppäimillä tai vetämällä.",
+                    )}
                     tabIndex={0}
                     onPointerDown={pointerDown}
                     onPointerMove={pointerMove}
@@ -1000,23 +1062,23 @@ function App() {
                     <div
                       className="canvas-logo-tools"
                       role="toolbar"
-                      aria-label="Valitun logon pikatoiminnot"
+                      aria-label={t("Valitun logon pikatoiminnot")}
                       style={{
                         left: `clamp(7.1rem, ${active.x / 8}%, calc(100% - 7.1rem))`,
                         top: `max(3.4rem, ${(active.y - logoBounds(active).y - 20) / 8}%)`,
                       }}
                     >
                       <button
-                        aria-label="Pienennä logoa"
-                        title="Pienennä logoa"
+                        aria-label={t("Pienennä logoa")}
+                        title={t("Pienennä logoa")}
                         disabled={!!busy || active.w <= 24}
                         onClick={() => editLogo({ w: active.w - 15 })}
                       >
                         <Minus size={16} />
                       </button>
                       <button
-                        aria-label="Suurenna logoa"
-                        title="Suurenna logoa"
+                        aria-label={t("Suurenna logoa")}
+                        title={t("Suurenna logoa")}
                         disabled={
                           !!busy ||
                           active.w >= Math.min(500, 600 * active.ratio)
@@ -1026,8 +1088,8 @@ function App() {
                         <Plus size={16} />
                       </button>
                       <button
-                        aria-label="Kopioi logo"
-                        title="Kopioi logo"
+                        aria-label={t("Kopioi logo")}
+                        title={t("Kopioi logo")}
                         disabled={!!busy}
                         onClick={copyLogo}
                       >
@@ -1035,13 +1097,13 @@ function App() {
                       </button>
                       <button
                         className="quick-delete"
-                        aria-label="Poista"
-                        title="Poista logo (Delete)"
+                        aria-label={t("Poista")}
+                        title={t("Poista logo (Delete)")}
                         disabled={!!busy}
                         onClick={() => removeLogo(active.id)}
                       >
                         <Trash2 size={15} />
-                        <span>Poista</span>
+                        <span>{t("Poista")}</span>
                       </button>
                     </div>
                   )}
@@ -1051,42 +1113,47 @@ function App() {
                     {imageError ? (
                       <>
                         <AlertCircle size={24} />
-                        <p>Tuotekuva ei latautunut.</p>
+                        <p>{t("Tuotekuva ei latautunut.")}</p>
                         <button
                           className="btn"
                           onClick={() => setRetry((n) => n + 1)}
                         >
-                          <RotateCcw size={15} /> Yritä uudelleen
+                          <RotateCcw size={15} />
+                          {" " + t("Yritä uudelleen") + " "}
                         </button>
                       </>
                     ) : (
                       <>
                         <LoaderCircle className="spin" size={24} />
-                        <p>Ladataan vaatetta…</p>
+                        <p>{t("Ladataan vaatetta…")}</p>
                       </>
                     )}
                   </div>
                 )}
                 {dragOver && (
                   <div className="drop-overlay">
-                    <ImagePlus size={28} /> Pudota logo tähän
+                    <ImagePlus size={28} />
+                    {" " + t("Pudota logo tähän") + " "}
                   </div>
                 )}
               </div>
               <div className="preview-bottom">
-                <div className="views" aria-label="Tuotteen kuvakulmat">
+                <div className="views" aria-label={t("Tuotteen kuvakulmat")}>
                   {product?.images.map((src, i) => (
                     <button
                       key={src + i}
                       className={view === i ? "active" : ""}
                       aria-pressed={view === i}
                       onClick={() => chooseView(i)}
-                      aria-label={`Kuvakulma ${i + 1}`}
+                      aria-label={t("Kuvakulma {0}", [i + 1])}
                     >
                       <img src={imageSrc(src)} alt="" />
-                      <span>Kuva {i + 1}</span>
+                      <span>
+                        {t("Kuva") + " "}
+                        {i + 1}
+                      </span>
                       {!!design.placements[product.id + ":" + i]?.length && (
-                        <i title="Logo lisätty" />
+                        <i title={t("Logo lisätty")} />
                       )}
                     </button>
                   ))}
@@ -1095,24 +1162,28 @@ function App() {
                   <MousePointer2 size={14} />
                   <span>
                     {logos.length
-                      ? "Siirrä vetämällä · muuta kokoa kulmasta"
-                      : "Lisää oma logo oikealta tai pudota se vaatteen päälle"}
+                      ? t("Siirrä vetämällä · muuta kokoa kulmasta")
+                      : t(
+                          "Lisää oma logo oikealta tai pudota se vaatteen päälle",
+                        )}
                   </span>
                 </div>
               </div>
               <div className="product-info">
                 <div>
-                  <span className="eyebrow">VALITTU VAATE</span>
-                  <h2>{product?.name || "Fristads-työvaate"}</h2>
+                  <span className="eyebrow">{t("VALITTU VAATE")}</span>
+                  <h2>
+                    {productText(product?.name) || t("Fristads-työvaate")}
+                  </h2>
                   <p>
                     {product?.id}
                     <span>·</span>
-                    {product?.color || "Fristads"}
+                    {productText(product?.color) || "Fristads"}
                   </p>
                   {!!product?.variants?.length && (
                     <div
                       className="color-swatches"
-                      aria-label="Värivaihtoehdot"
+                      aria-label={t("Värivaihtoehdot")}
                     >
                       {product.variants
                         .filter(
@@ -1122,8 +1193,8 @@ function App() {
                         .map((v) => (
                           <button
                             key={v.id}
-                            aria-label={`Väri: ${v.name}`}
-                            title={v.name}
+                            aria-label={t("Väri: {0}", [productText(v.name)])}
+                            title={productText(v.name)}
                             aria-pressed={v.id === product.id}
                             disabled={!!busy}
                             className={v.id === product.id ? "active" : ""}
@@ -1155,17 +1226,17 @@ function App() {
                     href={product.url}
                     target="_blank"
                     rel="noreferrer"
-                    aria-label="Avaa tuote Fristadsin sivuilla"
+                    aria-label={t("Avaa tuote Fristadsin sivuilla")}
                   >
                     <ArrowUpRight size={20} />
                   </a>
                 )}
               </div>
             </section>
-            <aside className="editor panel" aria-label="Logon muokkaus">
+            <aside className="editor panel" aria-label={t("Logon muokkaus")}>
               <div className="panel-heading">
                 <span className="step">02</span>
-                <h2>Lisää oma ilme</h2>
+                <h2>{t("Lisää oma ilme")}</h2>
               </div>
               <div className="editor-body">
                 <button
@@ -1187,15 +1258,15 @@ function App() {
                   </span>
                   <strong>
                     {busy === "upload"
-                      ? "Käsitellään logoa…"
-                      : "Lataa oma logo"}
+                      ? t("Käsitellään logoa…")
+                      : t("Lataa oma logo")}
                   </strong>
-                  <span>Valitse tiedosto tai pudota tähän</span>
-                  <small>PNG, SVG, JPG tai WebP · enintään 10 Mt</small>
+                  <span>{t("Valitse tiedosto tai pudota tähän")}</span>
+                  <small>{t("PNG, SVG, JPG tai WebP · enintään 10 Mt")}</small>
                 </button>
                 {!logos.length && (
                   <p className="upload-hint">
-                    Läpinäkyvä PNG tai SVG toimii parhaiten.
+                    {" " + t("Läpinäkyvä PNG tai SVG toimii parhaiten.") + " "}
                   </p>
                 )}
                 {matchingLayout && (
@@ -1212,20 +1283,24 @@ function App() {
                         editLogos(copies);
                         setSelected(copies[0].id);
                         notify(
-                          "Sommittelu kopioitu. Tarkista sijoittelu uudessa värissä.",
+                          t(
+                            "Sommittelu kopioitu. Tarkista sijoittelu uudessa värissä.",
+                          ),
                         );
                       } catch (e) {
                         fail(e);
                       }
                     }}
                   >
-                    <Copy size={15} /> Kopioi saman mallin logot
+                    <Copy size={15} />
+                    {" " + t("Kopioi saman mallin logot") + " "}
                   </button>
                 )}
                 {!!library.length && (
                   <details className="logo-library">
                     <summary>
-                      Käytä jo ladattua logoa <span>{library.length}</span>
+                      {" " + t("Käytä jo ladattua logoa") + " "}
+                      <span>{library.length}</span>
                       <ChevronDown size={14} />
                     </summary>
                     <div>
@@ -1234,7 +1309,7 @@ function App() {
                           key={l.src}
                           disabled={!!busy}
                           title={l.name}
-                          aria-label={`Lisää logo ${l.name}`}
+                          aria-label={t("Lisää logo {0}", [l.name])}
                           onClick={() => addExisting(l)}
                         >
                           <img src={l.src} alt={l.name} />
@@ -1246,16 +1321,16 @@ function App() {
                 )}
                 <div className="section-label">
                   <Layers size={15} />
-                  <h3>Logot tässä kuvassa</h3>
+                  <h3>{t("Logot tässä kuvassa")}</h3>
                   <span>{logos.length}</span>
                   {logos.length > 1 && (
                     <button
                       className="text-btn clear-logos"
-                      aria-label="Poista tämän kuvan logot"
+                      aria-label={t("Poista tämän kuvan logot")}
                       disabled={!!busy}
                       onClick={removeAllLogos}
                     >
-                      Tyhjennä
+                      {" " + t("Tyhjennä") + " "}
                     </button>
                   )}
                 </div>
@@ -1279,8 +1354,8 @@ function App() {
                         </button>
                         <button
                           className="remove-logo"
-                          aria-label={`Poista logo ${l.name}`}
-                          title="Poista logo"
+                          aria-label={`${t("Poista logo")} ${l.name}`}
+                          title={t("Poista logo")}
                           disabled={!!busy}
                           onClick={() => removeLogo(l.id)}
                         >
@@ -1297,35 +1372,37 @@ function App() {
                         <Plus size={12} />
                       </span>
                     </div>
-                    <p>Lisää logo ja siirrä se paikalleen.</p>
+                    <p>{t("Lisää logo ja siirrä se paikalleen.")}</p>
                   </div>
                 )}
                 {active && (
                   <div className="controls">
                     <div className="section-label">
-                      <h3>Muokkaa logoa</h3>
+                      <h3>{t("Muokkaa logoa")}</h3>
                       <button
                         className="text-btn"
-                        title="Keskitä vaakasuunnassa"
+                        title={t("Keskitä vaakasuunnassa")}
                         onClick={() => editLogo({ x: 400 })}
                       >
-                        <AlignHorizontalJustifyCenter size={14} /> Keskitä
+                        <AlignHorizontalJustifyCenter size={14} />
+                        {" " + t("Keskitä") + " "}
                       </button>
                     </div>
                     <div className="presets">
                       {placement.presets.map(([label, x, y]) => (
                         <button key={label} onClick={() => editLogo({ x, y })}>
-                          {label}
+                          {t(label)}
                         </button>
                       ))}
                     </div>
                     <label className="range-label">
-                      Koko{" "}
+                      {" " + t("Koko")}{" "}
                       <output>
-                        {Math.round(active.w / 8)} % kuvan leveydestä
+                        {Math.round(active.w / 8)}
+                        {" " + t("% kuvan leveydestä") + " "}
                       </output>
                       <input
-                        aria-label="Logon koko"
+                        aria-label={t("Logon koko")}
                         type="range"
                         min="24"
                         max={Math.min(500, 600 * active.ratio)}
@@ -1337,41 +1414,47 @@ function App() {
                     </label>
                     <div className="print-option">
                       <span>
-                        <strong>Logon pinta</strong>
+                        <strong>{t("Logon pinta")}</strong>
                         <small>
-                          Painettu ilme seuraa kankaan pintaa ja poimuja.
+                          {" " +
+                            t(
+                              "Painettu ilme seuraa kankaan pintaa ja poimuja.",
+                            ) +
+                            " "}
                         </small>
                       </span>
                       <div
                         className="finish-options"
                         role="group"
-                        aria-label="Logon pinta"
+                        aria-label={t("Logon pinta")}
                       >
                         <button
                           type="button"
                           aria-pressed={active.printed !== false}
                           onClick={() => editLogo({ printed: true })}
                         >
-                          Painettu ilme
+                          {" " + t("Painettu ilme") + " "}
                         </button>
                         <button
                           type="button"
                           aria-pressed={active.printed === false}
                           onClick={() => editLogo({ printed: false })}
                         >
-                          Flat 2D
+                          {" " + t("Flat 2D") + " "}
                         </button>
                       </div>
                     </div>
                     <details className="advanced-controls">
                       <summary>
-                        Lisäsäädöt <span>Kierto ja peittävyys</span>
+                        {" " + t("Lisäsäädöt") + " "}
+                        <span>{t("Kierto ja peittävyys")}</span>
                         <ChevronDown size={14} />
                       </summary>
                       <label className="range-label">
-                        Kierto <output>{Math.round(active.rotation)}°</output>
+                        {" " + t("Kierto") + " "}
+                        <output>{Math.round(active.rotation)}°</output>
                         <input
-                          aria-label="Logon kierto"
+                          aria-label={t("Logon kierto")}
                           type="range"
                           min="-180"
                           max="180"
@@ -1383,10 +1466,10 @@ function App() {
                         />
                       </label>
                       <label className="range-label">
-                        Peittävyys{" "}
+                        {" " + t("Peittävyys")}{" "}
                         <output>{Math.round(active.opacity * 100)} %</output>
                         <input
-                          aria-label="Logon peittävyys"
+                          aria-label={t("Logon peittävyys")}
                           type="range"
                           min="0"
                           max="100"
@@ -1408,7 +1491,7 @@ function App() {
                       ) : (
                         <WandSparkles size={15} />
                       )}{" "}
-                      Poista valkoinen tausta
+                      {" " + t("Poista valkoinen tausta") + " "}
                     </button>
                     <div className="logo-actions">
                       <button
@@ -1430,20 +1513,22 @@ function App() {
                           }
                         }}
                       >
-                        <Copy size={14} /> Kopioi
+                        <Copy size={14} />
+                        {" " + t("Kopioi") + " "}
                       </button>
                       <button
                         className="btn delete"
-                        aria-label="Poista valittu logo"
+                        aria-label={t("Poista valittu logo")}
                         disabled={!!busy}
                         onClick={() => removeLogo(selected)}
                       >
-                        <Trash2 size={14} /> Poista
+                        <Trash2 size={14} />
+                        {" " + t("Poista") + " "}
                       </button>
                       <button
                         className="icon-button"
-                        aria-label="Siirrä logoa taaksepäin"
-                        title="Siirrä taaksepäin"
+                        aria-label={t("Siirrä logoa taaksepäin")}
+                        title={t("Siirrä taaksepäin")}
                         disabled={logos[0]?.id === selected}
                         onClick={() => reorder(-1)}
                       >
@@ -1451,8 +1536,8 @@ function App() {
                       </button>
                       <button
                         className="icon-button"
-                        aria-label="Siirrä logoa eteenpäin"
-                        title="Siirrä eteenpäin"
+                        aria-label={t("Siirrä logoa eteenpäin")}
+                        title={t("Siirrä eteenpäin")}
                         disabled={logos.at(-1)?.id === selected}
                         onClick={() => reorder(1)}
                       >
@@ -1463,7 +1548,11 @@ function App() {
                 )}
                 {!!logos.length && !active && (
                   <p className="select-hint">
-                    Valitse logo kuvasta tai listasta muokataksesi sitä.
+                    {" " +
+                      t(
+                        "Valitse logo kuvasta tai listasta muokataksesi sitä.",
+                      ) +
+                      " "}
                   </p>
                 )}
               </div>
@@ -1478,7 +1567,8 @@ function App() {
                   ) : (
                     <ArrowDownToLine size={17} />
                   )}{" "}
-                  Lataa esikatselu <span>PNG</span>
+                  {" " + t("Lataa esikatselu") + " "}
+                  <span>PNG</span>
                 </button>
                 <button
                   className="btn full pdf-button"
@@ -1490,12 +1580,15 @@ function App() {
                   ) : (
                     <FileText size={16} />
                   )}{" "}
-                  Lataa yhteenveto <span>PDF</span>
+                  {" " + t("Lataa yhteenveto") + " "}
+                  <span>PDF</span>
                 </button>
                 <p>
                   {usedViews
-                    ? `PDF sisältää kaikki ${usedViews} suunniteltua kuvakulmaa`
-                    : "Lisää logo, niin voit ladata PDF-yhteenvedon"}
+                    ? t("PDF sisältää kaikki {0} suunniteltua kuvakulmaa", [
+                        usedViews,
+                      ])
+                    : t("Lisää logo, niin voit ladata PDF-yhteenvedon")}
                 </p>
               </div>
             </aside>
@@ -1503,9 +1596,10 @@ function App() {
         )}
         <footer>
           <span>
-            <ShieldCheck size={14} /> Logot säilyvät selaimessasi
+            <ShieldCheck size={14} />
+            {" " + t("Logot säilyvät selaimessasi") + " "}
           </span>
-          <p>Esikatselu. Painatusmitat vahvistetaan erikseen.</p>
+          <p>{t("Esikatselu. Painatusmitat vahvistetaan erikseen.")}</p>
         </footer>
       </main>
       <input
@@ -1533,38 +1627,45 @@ function App() {
           ) : (
             <Check size={18} />
           )}
-          <span>{toast.message}</span>
+          <span>{t(toast.message)}</span>
           {toast.undoAfter === design && (
             <button
               className="toast-undo"
-              aria-label="Kumoa poisto"
+              aria-label={t("Kumoa poisto")}
               onClick={() => {
                 history.undo();
                 setSelected(toast.restoreSelection || null);
                 setToast(null);
               }}
             >
-              <Undo2 size={14} /> Kumoa
+              <Undo2 size={14} />
+              {" " + t("Kumoa") + " "}
             </button>
           )}
-          <button aria-label="Sulje ilmoitus" onClick={() => setToast(null)}>
+          <button
+            aria-label={t("Sulje ilmoitus")}
+            onClick={() => setToast(null)}
+          >
             <X size={16} />
           </button>
         </div>
       )}
       {dialog?.type === "import" && (
         <Modal
-          title="Löydä juuri oikea vaate."
+          title={t("Löydä juuri oikea vaate.")}
           busy={busy === "import"}
           onClose={closing}
         >
           <p>
-            Avaa haluamasi vaate ja väri Fristadsin sivuilla. Kopioi tuotteen
-            osoite tähän.
+            {" " +
+              t(
+                "Avaa haluamasi vaate ja väri Fristadsin sivuilla. Kopioi tuotteen osoite tähän.",
+              ) +
+              " "}
           </p>
           <form onSubmit={importProduct}>
             <label>
-              Tuotteen osoite
+              {" " + t("Tuotteen osoite") + " "}
               <input
                 data-autofocus
                 type="url"
@@ -1576,17 +1677,19 @@ function App() {
             </label>
             {error && (
               <p className="error" role="alert">
-                {error}
+                {t(error)}
               </p>
             )}
             <button className="btn primary full" disabled={!!busy}>
               {busy === "import" ? (
                 <>
-                  <LoaderCircle className="spin" size={17} /> Haetaan tuotetta…
+                  <LoaderCircle className="spin" size={17} />
+                  {" " + t("Haetaan tuotetta…") + " "}
                 </>
               ) : (
                 <>
-                  <Plus size={17} /> Lisää vaate
+                  <Plus size={17} />
+                  {" " + t("Lisää vaate") + " "}
                 </>
               )}
             </button>
@@ -1597,61 +1700,88 @@ function App() {
             target="_blank"
             rel="noreferrer"
           >
-            Selaa Fristadsin vaatteita <ArrowUpRight size={15} />
+            {" " + t("Selaa Fristadsin vaatteita") + " "}
+            <ArrowUpRight size={15} />
           </a>
         </Modal>
       )}
       {dialog?.type === "help" && (
-        <Modal title="Oma ilme, muutamassa vaiheessa." onClose={closing}>
+        <Modal title={t("Oma ilme, muutamassa vaiheessa.")} onClose={closing}>
           <ol className="help-list">
             <li>
-              <strong>Valitse vaate.</strong> Selaa valikoimaa tai lisää
-              haluamasi tuote ja väri Fristads-tuotelinkillä.
+              <strong>{t("Valitse vaate.")}</strong>
+              {" " +
+                t(
+                  STATIC_SITE
+                    ? "Selaa valikoimaa ja valitse vaate sekä väri."
+                    : "Selaa valikoimaa tai lisää haluamasi tuote ja väri Fristads-tuotelinkillä.",
+                ) +
+                " "}
             </li>
             <li>
-              <strong>Lataa logo.</strong> PNG, SVG, JPG ja WebP sopivat.
-              Tarvittaessa voit poistaa valkoisen reunataustan. Sisäpuolelle
-              rajatut valkoiset yksityiskohdat säilyvät.
+              <strong>{t("Lataa logo.")}</strong>
+              {" " +
+                t(
+                  "PNG, SVG, JPG ja WebP sopivat. Tarvittaessa voit poistaa valkoisen reunataustan. Sisäpuolelle rajatut valkoiset yksityiskohdat säilyvät.",
+                ) +
+                " "}
             </li>
             <li>
-              <strong>Sovita paikoilleen.</strong> Vedä logoa, muuta kokoa
-              kulmakahvoista ja hienosäädä nuolinäppäimillä. Shift nopeuttaa
-              siirtoa, Alt ohittaa keskikohdan kohdistuksen.
+              <strong>{t("Sovita paikoilleen.")}</strong>
+              {" " +
+                t(
+                  "Vedä logoa, muuta kokoa kulmakahvoista ja hienosäädä nuolinäppäimillä. Shift nopeuttaa siirtoa, Alt ohittaa keskikohdan kohdistuksen.",
+                ) +
+                " "}
             </li>
             <li>
-              <strong>Kokeile eri kuvakulmia.</strong> Jokaisella kuvalla on oma
-              sommittelunsa. Voit käyttää jo ladattua logoa uudelleen.
+              <strong>{t("Kokeile eri kuvakulmia.")}</strong>
+              {" " +
+                t(
+                  "Jokaisella kuvalla on oma sommittelunsa. Voit käyttää jo ladattua logoa uudelleen.",
+                ) +
+                " "}
             </li>
             <li>
-              <strong>Tallenna ja esittele.</strong> PNG tallentaa nykyisen
-              näkymän. PDF kokoaa kaikki sommittelut. Suunnitelmatiedoston voi
-              avata myöhemmin muokattavaksi.
+              <strong>{t("Tallenna ja esittele.")}</strong>
+              {" " +
+                t(
+                  "PNG tallentaa nykyisen näkymän. PDF kokoaa kaikki sommittelut. Suunnitelmatiedoston voi avata myöhemmin muokattavaksi.",
+                ) +
+                " "}
             </li>
           </ol>
           <div className="help-note">
             <ShieldCheck size={20} />
             <p>
-              Logot pysyvät omassa selaimessasi. Työ tallentuu automaattisesti,
-              mutta suunnitelmatiedosto on siirrettävä varmuuskopiosi.
+              {" " +
+                t(
+                  "Logot pysyvät omassa selaimessasi. Työ tallentuu automaattisesti, mutta suunnitelmatiedosto on siirrettävä varmuuskopiosi.",
+                ) +
+                " "}
             </p>
           </div>
           <button className="btn primary full" onClick={closing}>
-            Jatka suunnittelua
+            {" " + t("Jatka suunnittelua") + " "}
           </button>
         </Modal>
       )}
       {dialog?.type === "new" && (
-        <Modal title="Aloitetaanko uusi suunnitelma?" onClose={closing}>
+        <Modal title={t("Aloitetaanko uusi suunnitelma?")} onClose={closing}>
           <p>
-            Nykyinen työ korvataan tyhjällä suunnitelmalla. Lataa se ensin
-            talteen, jos haluat jatkaa sitä myöhemmin.
+            {" " +
+              t(
+                "Nykyinen työ korvataan tyhjällä suunnitelmalla. Lataa se ensin talteen, jos haluat jatkaa sitä myöhemmin.",
+              ) +
+              " "}
           </p>
           <button className="btn full" disabled={!!busy} onClick={saveDesign}>
-            <ArrowDownToLine size={16} /> Tallenna nykyinen suunnitelma
+            <ArrowDownToLine size={16} />
+            {" " + t("Tallenna nykyinen suunnitelma") + " "}
           </button>
           <div className="dialog-actions">
             <button className="btn" onClick={closing}>
-              Peruuta
+              {" " + t("Peruuta") + " "}
             </button>
             <button
               className="btn primary"
@@ -1665,32 +1795,36 @@ function App() {
                 setCategory("Kaikki");
                 setDialog(null);
                 notify(
-                  "Uusi suunnitelma aloitettu. Kumoa palauttaa edellisen työn.",
+                  t(
+                    "Uusi suunnitelma aloitettu. Kumoa palauttaa edellisen työn.",
+                  ),
                 );
               }}
             >
-              Aloita uusi
+              {" " + t("Aloita uusi") + " "}
             </button>
           </div>
         </Modal>
       )}
       {dialog?.type === "presentation" && (
         <Modal
-          title={design.title || "Oma työvaatemallisto"}
+          title={design.title || t("Oma työvaatemallisto")}
           wide
           returnFocus={dialog.returnFocus}
           onClose={closing}
         >
           <div className="presentation-meta">
-            <span>{product?.name}</span>
+            <span>{productText(product?.name)}</span>
             <span>
-              {product?.id} · Kuva {view + 1}
+              {product?.id}
+              {" " + t("· Kuva") + " "}
+              {view + 1}
             </span>
           </div>
           <img
             className="presentation-image"
             src={dialog.src}
-            alt={`${product?.name} omalla logolla`}
+            alt={productText(product?.name)}
           />
           <div className="presentation-footer">
             <span>FRISTADS / LOGO STUDIO</span>
@@ -1699,7 +1833,8 @@ function App() {
               disabled={!!busy}
               onClick={exportPng}
             >
-              <ArrowDownToLine size={16} /> Lataa esikatselu
+              <ArrowDownToLine size={16} />
+              {" " + t("Lataa esikatselu") + " "}
             </button>
           </div>
         </Modal>

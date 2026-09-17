@@ -1,3 +1,4 @@
+import { t } from "./i18n.js";
 import { printedLogo } from "./printed.js";
 import { STATIC_SITE, BASE_URL } from "./runtime.js";
 export const MAX_LOGOS = 20;
@@ -10,7 +11,7 @@ export const imageSrc = (src) => {
 export const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 export const freshDesign = () => ({
   version: 1,
-  title: "Oma työvaatemallisto",
+  title: t("Oma työvaatemallisto"),
   productId: "100239-940",
   view: 0,
   placements: {},
@@ -25,7 +26,9 @@ export function loadImage(src) {
     image.onload = () => resolve(image);
     image.onerror = () =>
       reject(
-        new Error("Kuvaa ei voitu avata. Tarkista tiedosto tai verkkoyhteys."),
+        new Error(
+          t("Kuvaa ei voitu avata. Tarkista tiedosto tai verkkoyhteys."),
+        ),
       );
     image.src = src;
   });
@@ -54,7 +57,9 @@ export function trimCanvas(canvas) {
     }
   if (right < left)
     throw new Error(
-      "Kuva on kokonaan läpinäkyvä. Valitse näkyvän logon sisältävä tiedosto.",
+      t(
+        "Kuva on kokonaan läpinäkyvä. Valitse näkyvän logon sisältävä tiedosto.",
+      ),
     );
   const cropped = canvasOf(right - left + 1, bottom - top + 1);
   cropped
@@ -74,7 +79,7 @@ export function trimCanvas(canvas) {
     cropped.width / cropped.height > 100 ||
     cropped.height / cropped.width > 100
   )
-    throw new Error("Logo on liian kapea. Tarkista kuvan rajaus.");
+    throw new Error(t("Logo on liian kapea. Tarkista kuvan rajaus."));
   return {
     src: cropped.toDataURL("image/png"),
     ratio: cropped.width / cropped.height,
@@ -82,13 +87,13 @@ export function trimCanvas(canvas) {
 }
 export async function rasterize(file) {
   if (file.size > 10 * 1024 * 1024)
-    throw new Error("Logon enimmäiskoko on 10 Mt.");
+    throw new Error(t("Logon enimmäiskoko on 10 Mt."));
   if (
     !["image/png", "image/jpeg", "image/webp", "image/svg+xml"].includes(
       file.type,
     )
   )
-    throw new Error("Valitse PNG-, JPG-, WebP- tai SVG-kuva.");
+    throw new Error(t("Valitse PNG-, JPG-, WebP- tai SVG-kuva."));
   if (file.type === "image/svg+xml") {
     const svg = new DOMParser().parseFromString(
       await file.text(),
@@ -115,7 +120,9 @@ export async function rasterize(file) {
       )
     )
       throw new Error(
-        "SVG sisältää ulkoista tai aktiivista sisältöä. Vie logo PNG-kuvana.",
+        t(
+          "SVG sisältää ulkoista tai aktiivista sisältöä. Vie logo PNG-kuvana.",
+        ),
       );
   }
   const url = URL.createObjectURL(file);
@@ -123,7 +130,9 @@ export async function rasterize(file) {
     const image = await loadImage(url);
     if (image.width * image.height > 40_000_000)
       throw new Error(
-        "Kuvan tarkkuus on liian suuri. Käytä enintään 40 megapikselin kuvaa.",
+        t(
+          "Kuvan tarkkuus on liian suuri. Käytä enintään 40 megapikselin kuvaa.",
+        ),
       );
     const scale = Math.min(1, 1600 / Math.max(image.width, image.height));
     const canvas = canvasOf(
@@ -183,7 +192,7 @@ export async function removeWhiteBackground(src) {
     changed = removeWhitePixels(pixels.data, canvas.width, canvas.height);
   if (!changed)
     throw new Error(
-      "Kuvan reunoilta ei löytynyt poistettavaa valkoista taustaa.",
+      t("Kuvan reunoilta ei löytynyt poistettavaa valkoista taustaa."),
     );
   ctx.putImageData(pixels, 0, 0);
   return trimCanvas(canvas);
@@ -416,7 +425,7 @@ function validProductImage(src) {
 }
 export function validateProducts(products) {
   if (!Array.isArray(products) || products.length > 200)
-    throw new Error("Virheelliset tuotetiedot.");
+    throw new Error(t("Virheelliset tuotetiedot."));
   return products.map((p) => {
     const url = new URL(p.url);
     if (
@@ -433,7 +442,7 @@ export function validateProducts(products) {
       url.password ||
       url.port
     )
-      throw new Error("Suunnitelmassa on virheelliset tuotetiedot.");
+      throw new Error(t("Suunnitelmassa on virheelliset tuotetiedot."));
     return {
       id: p.id,
       name: p.name,
@@ -460,7 +469,7 @@ export function validateProducts(products) {
                 v.colors.length > 2 ||
                 !v.colors.every((c) => /^#[0-9a-f]{6}$/i.test(c))
               )
-                throw Error("Virheellinen tuotteen värivaihtoehto.");
+                throw Error(t("Virheellinen tuotteen värivaihtoehto."));
               return {
                 id: v.id,
                 name: v.name.slice(0, 100),
@@ -488,7 +497,7 @@ export function validateDesign(design) {
     !design.placements ||
     Array.isArray(design.placements)
   )
-    throw new Error("Tiedosto ei ole Logo Studion suunnitelma.");
+    throw new Error(t("Tiedosto ei ole Logo Studion suunnitelma."));
   let count = 0;
   const placements = {};
   for (const [key, logos] of Object.entries(design.placements)) {
@@ -497,7 +506,7 @@ export function validateDesign(design) {
       !Array.isArray(logos) ||
       logos.length > MAX_LOGOS
     )
-      throw new Error("Virheellinen suunnitelman kuvakulma.");
+      throw new Error(t("Virheellinen suunnitelman kuvakulma."));
     const ids = new Set();
     placements[key] = logos.map((l) => {
       if (
@@ -527,7 +536,7 @@ export function validateDesign(design) {
         l.y > 800 ||
         Math.abs(l.rotation) > 180
       )
-        throw new Error("Suunnitelmassa on virheellisiä logotietoja.");
+        throw new Error(t("Suunnitelmassa on virheellisiä logotietoja."));
       ids.add(l.id);
       return {
         id: l.id,

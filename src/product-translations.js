@@ -1,0 +1,151 @@
+export const productTranslations = Object.fromEntries(
+  [
+    [
+      "Green heavy pikeepaita 7047 GPM",
+      "Green heavy polo shirt 7047 GPM",
+      "Green kraftig pikétröja 7047 GPM",
+    ],
+    [
+      "Acode t-paita 1911 BSJ",
+      "Acode T-shirt 1911 BSJ",
+      "Acode t-shirt 1911 BSJ",
+    ],
+    [
+      "High vis Green stretch talvitakki lk 1 4685 GLPS",
+      "High vis Green stretch winter jacket class 1 4685 GLPS",
+      "Varsel Green stretch vinterjacka klass 1 4685 GLPS",
+    ],
+    [
+      "Rakentajan stretch housut 2230 GHST",
+      "Craftsman stretch trousers 2230 GHST",
+      "Hantverkarbyxor stretch 2230 GHST",
+    ],
+    [
+      "Green collegepaita luomupuuvilla 7611 GKS",
+      "Green organic cotton sweatshirt 7611 GKS",
+      "Green sweatshirt ekologisk bomull 7611 GKS",
+    ],
+    [
+      "Stretch softshell takki 4905 SSF",
+      "Stretch softshell jacket 4905 SSF",
+      "Softshelljacka stretch 4905 SSF",
+    ],
+    [
+      "High vis t-paita lk 3 7724 THV",
+      "High vis T-shirt class 3 7724 THV",
+      "Varsel t-shirt klass 3 7724 THV",
+    ],
+    [
+      "Green heavy pitkähihainen T-paita 7071 GTM",
+      "Green heavy long-sleeved T-shirt 7071 GTM",
+      "Green kraftig långärmad t-shirt 7071 GTM",
+    ],
+    [
+      "Flex rakentajan stretch housut 2800 GSTT",
+      "Flex craftsman stretch trousers 2800 GSTT",
+      "Flex hantverkarbyxor stretch 2800 GSTT",
+    ],
+    [
+      "Rakentajan stretch housut naisten 2901 GWM",
+      "Women's craftsman stretch trousers 2901 GWM",
+      "Hantverkarbyxor stretch dam 2901 GWM",
+    ],
+    [
+      "Rakentajan stretch housut 2760 GLWS",
+      "Craftsman stretch trousers 2760 GLWS",
+      "Hantverkarbyxor stretch 2760 GLWS",
+    ],
+    [
+      "High vis Green rakentajan stretch housut lk 1 2906 GWM",
+      "High vis Green craftsman stretch trousers class 1 2906 GWM",
+      "Varsel Green hantverkarbyxor stretch klass 1 2906 GWM",
+    ],
+    [
+      "Airtech® talvihousut 2698 GTT",
+      "Airtech® winter trousers 2698 GTT",
+      "Airtech® vinterbyxor 2698 GTT",
+    ],
+    [
+      "PrimaLoft® stretch talvitakki 4873 GLPS",
+      "PrimaLoft® stretch winter jacket 4873 GLPS",
+      "PrimaLoft® stretch vinterjacka 4873 GLPS",
+    ],
+    [
+      "Stretch kuoritakki naisten 4981 GLS",
+      "Women's stretch shell jacket 4981 GLS",
+      "Skaljacka stretch dam 4981 GLS",
+    ],
+    [
+      "High vis Green stretch kuoritakki lk 3 4680 GLPS",
+      "High vis Green stretch shell jacket class 3 4680 GLPS",
+      "Varsel Green stretch skaljacka klass 3 4680 GLPS",
+    ],
+    [
+      "Polartec® stretch fleecetakki 4870 GPY",
+      "Polartec® stretch fleece jacket 4870 GPY",
+      "Polartec® stretch fleecejacka 4870 GPY",
+    ],
+    [
+      "Acode softshell liivi 1506 SBT",
+      "Acode softshell vest 1506 SBT",
+      "Acode softshellväst 1506 SBT",
+    ],
+    [
+      "High vis Green liivi LK 2 5067 GPLU",
+      "High vis Green vest class 2 5067 GPLU",
+      "Varsel Green väst klass 2 5067 GPLU",
+    ],
+    [
+      "Flex rakentajan stretch shortsit 2803 GHST",
+      "Flex craftsman stretch shorts 2803 GHST",
+      "Flex hantverkarshorts stretch 2803 GHST",
+    ],
+    [
+      "Rakentajan stretch shortsit 2762 LWS",
+      "Craftsman stretch shorts 2762 LWS",
+      "Hantverkarshorts stretch 2762 LWS",
+    ],
+    [
+      "Hupullinen collegetakki 7831 GKI",
+      "Hooded sweatshirt jacket 7831 GKI",
+      "Sweatshirtjacka med huva 7831 GKI",
+    ],
+    [
+      "High vis Green hupullinen stretch collegetakki lk 1 7532 GKC",
+      "High vis Green stretch hoodie class 1 7532 GKC",
+      "Varsel Green stretch huvtröja klass 1 7532 GKC",
+    ],
+    [
+      "Collegepaita Close the loop 7850 CLS",
+      "Close the loop sweatshirt 7850 CLS",
+      "Close the loop sweatshirt 7850 CLS",
+    ],
+    [
+      "Green umpihaalari 8930 GWM",
+      "Green coverall 8930 GWM",
+      "Green overall 8930 GWM",
+    ],
+    [
+      "High vis umpihaalari lk 3 8026 GPLU",
+      "High vis coverall class 3 8026 GPLU",
+      "Varsel overall klass 3 8026 GPLU",
+    ],
+    ["Musta", "Black", "Svart"],
+    ["Valkoinen", "White", "Vit"],
+    ["Tummanharmaa", "Dark grey", "Mörkgrå"],
+    ["Harmaa", "Grey", "Grå"],
+    ["Vaaleanharmaa", "Light grey", "Ljusgrå"],
+    ["Vaaleansininen", "Light blue", "Ljusblå"],
+    ["Tummansininen", "Dark blue", "Mörkblå"],
+    ["Navysininen", "Navy", "Marinblå"],
+    ["Oranssi", "Orange", "Orange"],
+    ["Keltainen", "Yellow", "Gul"],
+    ["Neonkeltainen", "Neon yellow", "Neongul"],
+    ["Punainen", "Red", "Röd"],
+    ["Sininen", "Blue", "Blå"],
+    ["Vihreä", "Green", "Grön"],
+    ["High vis keltainen", "High vis yellow", "Varselgul"],
+    ["High vis Keltainen", "High vis yellow", "Varselgul"],
+    ["High Vis Oranssi", "High vis orange", "Varselorange"],
+  ].map(([fi, en, sv]) => [fi, { en, sv }]),
+);
