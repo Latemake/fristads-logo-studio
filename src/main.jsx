@@ -92,6 +92,7 @@ function App() {
     [dragOver, setDragOver] = useState(false);
   const canvas = useRef(),
     upload = useRef(),
+    photos = useRef(),
     openFile = useRef(),
     drag = useRef(),
     saveQueue = useRef(Promise.resolve()),
@@ -445,12 +446,19 @@ function App() {
       checkCapacity(added.length, targetKey);
       editLogos((items) => [...items, ...added], targetKey);
       setSelected(added.at(-1).id);
+      if (window.matchMedia("(max-width: 620px)").matches)
+        requestAnimationFrame(() =>
+          document
+            .querySelector(".preview")
+            ?.scrollIntoView({ block: "start", behavior: "smooth" }),
+        );
       notify(t("Logo lisätty. Siirrä vetämällä, muuta kokoa kulmasta."));
     } catch (e) {
       fail(e);
     } finally {
       setBusy("");
       if (upload.current) upload.current.value = "";
+      if (photos.current) photos.current.value = "";
     }
   }
   function addExisting(logo) {
@@ -967,6 +975,22 @@ function App() {
               className="preview panel"
               aria-label={t("Esikatselutyötila")}
             >
+              <div className="mobile-photo-actions">
+                <button
+                  className="btn primary"
+                  disabled={!ready || !!busy}
+                  onClick={() => photos.current.click()}
+                >
+                  <ImagePlus size={18} /> {t("Valitse kuvista")}
+                </button>
+                <button
+                  className="btn"
+                  disabled={!ready || !!busy}
+                  onClick={() => upload.current.click()}
+                >
+                  <FolderOpen size={18} /> {t("Tiedosto")}
+                </button>
+              </div>
               <div className="preview-toolbar">
                 <div>
                   <span className="live-dot" />
@@ -1138,6 +1162,18 @@ function App() {
                 )}
               </div>
               <div className="preview-bottom">
+                {active && (
+                  <button
+                    className="mobile-edit-link text-btn"
+                    onClick={() =>
+                      document
+                        .querySelector(".controls")
+                        ?.scrollIntoView({ block: "start", behavior: "smooth" })
+                    }
+                  >
+                    {t("Muokkaa logoa")} <ArrowDown size={16} />
+                  </button>
+                )}
                 <div className="views" aria-label={t("Tuotteen kuvakulmat")}>
                   {product?.images.map((src, i) => (
                     <button
@@ -1239,6 +1275,13 @@ function App() {
                 <h2>{t("Lisää oma ilme")}</h2>
               </div>
               <div className="editor-body">
+                <button
+                  className="btn full photo-library-button"
+                  disabled={!ready || !!busy}
+                  onClick={() => photos.current.click()}
+                >
+                  <ImagePlus size={18} /> {t("Valitse kuvista")}
+                </button>
                 <button
                   className={"upload-zone " + (logos.length ? "compact" : "")}
                   disabled={!ready || !!busy}
@@ -1616,6 +1659,15 @@ function App() {
         type="file"
         accept="application/json,.json"
         onChange={(e) => openDesign(e.target.files[0])}
+      />
+      <input
+        ref={photos}
+        className="hidden"
+        data-testid="photo-library-input"
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={(e) => addFiles(e.target.files)}
       />
       {toast && (
         <div

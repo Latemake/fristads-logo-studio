@@ -1961,6 +1961,121 @@ footer > span:last-child {
     font-size: 0.84615rem;
   }
 }
+.mobile-photo-actions,
+.mobile-edit-link {
+  display: none;
+}
+.photo-library-button {
+  margin-bottom: 0.7rem;
+  grid-column: 1;
+}
+@media (min-width: 621px) and (max-width: 1000px) {
+  .photo-library-button {
+    grid-row: 1;
+  }
+  .upload-zone {
+    grid-row: 2 / 4;
+  }
+}
+@media (max-width: 620px) {
+  .topbar {
+    gap: 0.6rem;
+    padding-inline: 1rem;
+  }
+  .studio-name,
+  .brand-divider {
+    display: none;
+  }
+  main {
+    padding-top: 0.8rem;
+  }
+  h1 {
+    font-size: 1.8rem;
+  }
+  h1 > span {
+    display: inline;
+  }
+  .page-title {
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+  }
+  .project-name input {
+    width: 100%;
+    min-width: 0;
+  }
+  .project-name label {
+    min-width: 0;
+    flex: 1;
+  }
+  .product-card {
+    flex-basis: 9rem;
+    scroll-snap-align: start;
+  }
+  .product-photo {
+    height: 7rem;
+  }
+  .product-grid {
+    scroll-snap-type: x proximity;
+  }
+  .mobile-photo-actions {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.6rem;
+    padding: 0.75rem;
+    border-bottom: 1px solid #e3eadb;
+  }
+  .mobile-edit-link {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+  }
+  .preview-toolbar > div:first-child {
+    display: none;
+  }
+  .toolbar-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .toolbar-actions button {
+    width: 44px;
+    height: 44px;
+  }
+  .btn,
+  .presets button,
+  .finish-options button,
+  .views button {
+    min-height: 44px;
+  }
+  .canvas-logo-tools button {
+    min-width: 44px;
+    height: 44px;
+  }
+  .range-label input {
+    height: 44px;
+  }
+  input:not([type="range"]):not([type="file"]),
+  select {
+    font-size: 16px;
+  }
+  .language-picker select {
+    font-size: 16px;
+    min-height: 44px;
+  }
+  .filter {
+    width: 9.5rem;
+  }
+  .editor-tip {
+    display: none;
+  }
+  .preview,
+  .controls {
+    scroll-margin-top: 0.75rem;
+  }
+  .export-area {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
 /* A full-window desktop workspace: scale the entire UI, not only the canvas. */
 @media (min-width: 1001px) {
   :root {

@@ -6,6 +6,8 @@
 
 Käyttöliittymässä on kolme kieltä: English (oletus), Suomi ja Svenska. Valinta tallentuu selaimeen. Kielenvaihto ei muuta suunnitelmaa, tuotetunnuksia tai käyttäjän kirjoittamaa nimeä. Käännökset ovat tiedostoissa `src/translations.js` ja `src/product-translations.js`; PDF-yhteenvedot käyttävät valittua kieltä.
 
+Puhelimella **Valitse kuvista** avaa käyttöjärjestelmän kuvavalitsimen (`accept="image/*"`, ilman kameraan pakottavaa `capture`-asetusta). **Tiedosto** säilyy vaihtoehtona. Kuvavalitsimen tarkka sisältö riippuu selaimesta ja käyttöjärjestelmästä. HEIC/HEIF-kuvat avataan, jos selain osaa purkaa ne; muuten käyttäjä saa ohjeen valita JPG- tai PNG-kuvan. Kuvia ei lähetetä palvelimelle. Mobiilin kosketuskohteita on suurennettu, lomakekentät käyttävät 16 px:n kirjasinkokoa ja esikatselusta pääsee suoraan muokkaussäätimiin.
+
 GitHub Pages julkaisee `main`-haaran `docs/`-kansion. Päivitä julkaisu komennolla `npm run stage:pages`, testaa `node scripts/check-pages.mjs` ja commitoi sekä pushaa muutokset. Julkinen versio toimii kokonaan selaimessa: logojen muokkaus, automaattitallennus ja PNG-, PDF- sekä JSON-viennit eivät tarvitse palvelinta.
 
 Pages-valikoima on `data/pages-products.json`. `node scripts/prepare-pages.mjs` päivittää sen paikallisesta valikoimasta ja lataa puuttuvat tuotekuvat. Julkisessa versiossa näkyvät vain valmiiksi mukana olevat värivaihtoehdot. Tuotelinkillä tuonti säilyy paikallisessa Express-versiossa, koska GitHub Pages ei suorita palvelinkoodia. Selaimeen tallennetut suunnitelmat ovat sivustokohtaisia: siirrä paikallinen työ julkiselle sivulle JSON-tiedostolla.

@@ -89,9 +89,14 @@ export async function rasterize(file) {
   if (file.size > 10 * 1024 * 1024)
     throw new Error(t("Logon enimmäiskoko on 10 Mt."));
   if (
-    !["image/png", "image/jpeg", "image/webp", "image/svg+xml"].includes(
-      file.type,
-    )
+    ![
+      "image/png",
+      "image/jpeg",
+      "image/webp",
+      "image/svg+xml",
+      "image/heic",
+      "image/heif",
+    ].includes(file.type)
   )
     throw new Error(t("Valitse PNG-, JPG-, WebP- tai SVG-kuva."));
   if (file.type === "image/svg+xml") {
@@ -127,7 +132,13 @@ export async function rasterize(file) {
   }
   const url = URL.createObjectURL(file);
   try {
-    const image = await loadImage(url);
+    const image = await loadImage(url).catch((error) => {
+      if (["image/heic", "image/heif"].includes(file.type))
+        throw new Error(
+          t("Kuvamuoto ei avaudu tässä selaimessa. Valitse JPG- tai PNG-kuva."),
+        );
+      throw error;
+    });
     if (image.width * image.height > 40_000_000)
       throw new Error(
         t(

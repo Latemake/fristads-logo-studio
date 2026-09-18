@@ -1,6 +1,13 @@
 // Finnish source keys stay stable; product IDs and category filter values are not translated.
 export const translations = Object.fromEntries(
   [
+    ["Valitse kuvista", "Choose from photos", "Välj från bilder"],
+    ["Tiedosto", "File", "Fil"],
+    [
+      "Kuvamuoto ei avaudu tässä selaimessa. Valitse JPG- tai PNG-kuva.",
+      "This image format cannot be opened in this browser. Choose a JPG or PNG image.",
+      "Bildformatet kan inte öppnas i den här webbläsaren. Välj en JPG- eller PNG-bild.",
+    ],
     ["Kaikki", "All", "Alla"],
     [
       "Anna Fristadsin yksittäisen tuotteen linkki.",
