@@ -900,14 +900,6 @@ h1 > span {
   height: 1.07692rem;
   cursor: pointer;
 }
-.background-button {
-  font-size: 0.76923rem;
-  margin-top: 1.30769rem;
-  min-height: 2.69231rem;
-  padding: 0.61538rem;
-  color: #4a6e33;
-  background: #f9fcf4;
-}
 .logo-actions {
   display: flex;
   gap: 0.46154rem;

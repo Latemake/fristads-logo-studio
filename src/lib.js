@@ -157,58 +157,6 @@ export async function rasterize(file) {
     URL.revokeObjectURL(url);
   }
 }
-// Only remove nearly white pixels connected to an edge; enclosed white details survive.
-export function removeWhitePixels(data, width, height, tolerance = 24) {
-  const queue = new Int32Array(width * height),
-    seen = new Uint8Array(width * height);
-  let head = 0,
-    tail = 0;
-  const add = (index) => {
-    if (seen[index]) return;
-    seen[index] = 1;
-    const offset = index * 4,
-      r = data[offset],
-      g = data[offset + 1],
-      b = data[offset + 2];
-    if (
-      data[offset + 3] < 8 ||
-      (Math.min(r, g, b) >= 255 - tolerance &&
-        Math.max(r, g, b) - Math.min(r, g, b) <= 12)
-    )
-      queue[tail++] = index;
-  };
-  for (let x = 0; x < width; x++) {
-    add(x);
-    add((height - 1) * width + x);
-  }
-  for (let y = 0; y < height; y++) {
-    add(y * width);
-    add(y * width + width - 1);
-  }
-  while (head < tail) {
-    const index = queue[head++];
-    data[index * 4 + 3] = 0;
-    if (index % width) add(index - 1);
-    if (index % width < width - 1) add(index + 1);
-    if (index >= width) add(index - width);
-    if (index < width * (height - 1)) add(index + width);
-  }
-  return tail;
-}
-export async function removeWhiteBackground(src) {
-  const image = await loadImage(src),
-    canvas = canvasOf(image.width, image.height),
-    ctx = canvas.getContext("2d");
-  ctx.drawImage(image, 0, 0);
-  const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height),
-    changed = removeWhitePixels(pixels.data, canvas.width, canvas.height);
-  if (!changed)
-    throw new Error(
-      t("Kuvan reunoilta ei löytynyt poistettavaa valkoista taustaa."),
-    );
-  ctx.putImageData(pixels, 0, 0);
-  return trimCanvas(canvas);
-}
 export function logoBounds(logo) {
   const radians = (logo.rotation * Math.PI) / 180,
     c = Math.abs(Math.cos(radians)),

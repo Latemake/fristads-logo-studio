@@ -211,11 +211,6 @@ export const translations = Object.fromEntries(
     ["Logon kierto", "Logo rotation", "Logotypens rotation"],
     ["Peittävyys", "Opacity", "Opacitet"],
     ["Logon peittävyys", "Logo opacity", "Logotypens opacitet"],
-    [
-      "Poista valkoinen tausta",
-      "Remove white background",
-      "Ta bort vit bakgrund",
-    ],
     ["Kopioi", "Duplicate", "Duplicera"],
     ["Poista valittu logo", "Delete selected logo", "Ta bort vald logotyp"],
     ["Siirrä logoa taaksepäin", "Move logo backward", "Flytta logotyp bakåt"],
@@ -283,9 +278,9 @@ export const translations = Object.fromEntries(
     ],
     ["Lataa logo.", "Upload your logo.", "Ladda upp din logotyp."],
     [
-      "PNG, SVG, JPG ja WebP sopivat. Tarvittaessa voit poistaa valkoisen reunataustan. Sisäpuolelle rajatut valkoiset yksityiskohdat säilyvät.",
-      "Use PNG, SVG, JPG or WebP. You can remove a white outer background while keeping enclosed white details.",
-      "Använd PNG, SVG, JPG eller WebP. Du kan ta bort en vit ytterbakgrund och behålla inneslutna vita detaljer.",
+      "PNG, SVG, JPG ja WebP sopivat. Käytä läpinäkyvää PNG- tai SVG-logoa, jos et halua taustaa mukaan.",
+      "Use PNG, SVG, JPG or WebP. Choose a transparent PNG or SVG logo if you do not want a background.",
+      "Använd PNG, SVG, JPG eller WebP. Välj en transparent PNG- eller SVG-logotyp om du inte vill ha en bakgrund.",
     ],
     ["Sovita paikoilleen.", "Position your logo.", "Placera logotypen."],
     [
@@ -446,11 +441,6 @@ export const translations = Object.fromEntries(
       "Designen har öppnats. Ångra återställer ditt tidigare arbete.",
     ],
     [
-      "Valkoinen reunatausta poistettu. Voit palauttaa sen Kumoa-painikkeella.",
-      "White outer background removed. Undo restores it.",
-      "Den vita ytterbakgrunden har tagits bort. Ångra återställer den.",
-    ],
-    [
       "Uusi suunnitelma aloitettu. Kumoa palauttaa edellisen työn.",
       "New design started. Undo restores the previous work.",
       "Ny design startad. Ångra återställer tidigare arbete.",
@@ -489,11 +479,6 @@ export const translations = Object.fromEntries(
       "Kuvan tarkkuus on liian suuri. Käytä enintään 40 megapikselin kuvaa.",
       "Image resolution is too high. Use an image up to 40 megapixels.",
       "Bilden har för hög upplösning. Använd en bild på högst 40 megapixlar.",
-    ],
-    [
-      "Kuvan reunoilta ei löytynyt poistettavaa valkoista taustaa.",
-      "No removable white background was found at the edges.",
-      "Ingen vit bakgrund som kan tas bort hittades vid kanterna.",
     ],
     [
       "Virheelliset tuotetiedot.",

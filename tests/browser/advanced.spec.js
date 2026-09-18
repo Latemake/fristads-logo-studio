@@ -103,41 +103,6 @@ test("existing logo reuse, two-page PDF and presentation focus restoration", asy
     page.getByRole("button", { name: "Esitysnäkymä", exact: true }),
   ).toBeFocused();
 });
-test("background removal keeps inner white details and is reversible", async ({
-  page,
-}) => {
-  await start(page);
-  await upload(
-    page,
-    svg(
-      '<rect width="100" height="100" fill="white"/><rect x="20" y="20" width="60" height="60" fill="black"/><rect x="40" y="40" width="20" height="20" fill="white"/>',
-      100,
-      100,
-    ),
-  );
-  const source = await page.locator(".logo-row img").getAttribute("src");
-  await page.getByRole("button", { name: "Poista valkoinen tausta" }).click();
-  await expect(page.locator(".toast[role=status]")).toContainText("poistettu");
-  const processed = await page.locator(".logo-row img").getAttribute("src");
-  expect(processed).not.toEqual(source);
-  const pixel = await page.evaluate(async (src) => {
-    const img = new Image();
-    img.src = src;
-    await img.decode();
-    const c = document.createElement("canvas");
-    c.width = img.width;
-    c.height = img.height;
-    c.getContext("2d").drawImage(img, 0, 0);
-    return {
-      width: img.width,
-      pixel: [...c.getContext("2d").getImageData(30, 30, 1, 1).data],
-    };
-  }, processed);
-  expect(pixel.width).toBe(60);
-  expect(pixel.pixel).toEqual([255, 255, 255, 255]);
-  await page.getByRole("button", { name: "Kumoa", exact: true }).click();
-  await expect(page.locator(".logo-row img")).toHaveAttribute("src", source);
-});
 test("transparent padding is cropped and empty or unsafe uploads do not destroy work", async ({
   page,
 }) => {

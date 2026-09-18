@@ -25,7 +25,6 @@ import {
   X,
   Maximize2,
   FileText,
-  WandSparkles,
   AlignHorizontalJustifyCenter,
   ArrowUp,
   ArrowDown,
@@ -54,7 +53,6 @@ import {
   allLogos,
   MAX_LOGOS,
   MAX_TOTAL_LOGOS,
-  removeWhiteBackground,
   renderScene,
   filename,
 } from "./lib";
@@ -679,25 +677,6 @@ function App() {
     } finally {
       setBusy("");
       openFile.current.value = "";
-    }
-  }
-  async function clearBackground() {
-    if (!active || busy) return;
-    const targetKey = key,
-      id = active.id;
-    setBusy("background");
-    try {
-      const processed = await removeWhiteBackground(active.src);
-      editLogo(processed, id, targetKey);
-      notify(
-        t(
-          "Valkoinen reunatausta poistettu. Voit palauttaa sen Kumoa-painikkeella.",
-        ),
-      );
-    } catch (e) {
-      fail(e);
-    } finally {
-      setBusy("");
     }
   }
   function reorder(direction) {
@@ -1583,18 +1562,6 @@ function App() {
                         />
                       </label>
                     </details>
-                    <button
-                      className="btn background-button full"
-                      disabled={!!busy}
-                      onClick={clearBackground}
-                    >
-                      {busy === "background" ? (
-                        <LoaderCircle className="spin" size={15} />
-                      ) : (
-                        <WandSparkles size={15} />
-                      )}{" "}
-                      {" " + t("Poista valkoinen tausta") + " "}
-                    </button>
                     <div className="logo-actions">
                       <button
                         className="btn"
@@ -1833,7 +1800,7 @@ function App() {
               <strong>{t("Lataa logo.")}</strong>
               {" " +
                 t(
-                  "PNG, SVG, JPG ja WebP sopivat. Tarvittaessa voit poistaa valkoisen reunataustan. Sisäpuolelle rajatut valkoiset yksityiskohdat säilyvät.",
+                  "PNG, SVG, JPG ja WebP sopivat. Käytä läpinäkyvää PNG- tai SVG-logoa, jos et halua taustaa mukaan.",
                 ) +
                 " "}
             </li>

@@ -71,7 +71,7 @@ Tuotantokoonti: `npm run build`, sitten `npm start`. Palvelin kuuntelee oletukse
 - Tuotesivulta haetut oikeat värivaihtoehdot. Väripainike avaa tutun värin heti tai hakee uuden Fristadsilta. Saman mallin logot voi kopioida toiseen väriin ilman alkuperäisen sommittelun muuttamista.
 - PNG-, JPG-, WebP- ja SVG-logot, raahaaminen, toimivat koonmuutoskahvat, kierto, peittävyys, kopiointi, poisto ja tasojärjestys.
 - Oletuksena käytettävä **Painettu ilme** sovittaa logon tuotekuvan valaistukseen ja kankaan pintatekstuuriin sekä taivuttaa sitä hienovaraisesti kuvasta arvioitujen poimujen mukaan. **Flat 2D** näyttää alkuperäisen tasaisen logon. Valinta säilyy suunnitelmassa ja näkyy PNG- ja PDF-viennissä. Efekti arvioi pinnan muodon valokuvasta eikä muodosta 3D-mallia.
-- Läpinäkyvien marginaalien automaattinen rajaus sekä valkoisen reunataustan poisto. Valkoiset, muilla väreillä suljetut sisäosat säilyvät. Poiston voi kumota.
+- Läpinäkyvien marginaalien automaattinen rajaus. Taustattomaan logoon käytetään läpinäkyvää PNG- tai SVG-tiedostoa; automaattinen valkoisen taustan poisto on poistettu, koska se voi poistaa myös logoon kuuluvia valkoisia osia.
 - Ladatun logon uudelleenkäyttö toisessa kuvakulmassa tai vaatteessa. Automaattinen keskikohdan kohdistus siirrettäessä; Alt ohittaa kohdistuksen.
 - Jokaisella tuotteella ja kuvakulmalla on erillinen sommittelu. Kuvasarjan kuvat on nimetty neutraalisti, sillä Fristads ei takaa kuvakulmien järjestystä.
 - Nuolinäppäimet siirtävät valittua logoa; Shift nopeuttaa. Ctrl+Z kumoaa, Ctrl+Shift+Z toistaa, Delete poistaa.
@@ -118,4 +118,4 @@ npm run test:e2e
 
 Selaintestit rakentavat ja testaavat oikeaa tuotantoversiota portissa 3100. Testipalvelimen tuonnit ja kuvavälimuisti tallentuvat erilliseen väliaikaishakemistoon: testit eivät muokkaa käyttäjän `data/imported.json`-tiedostoa tai selaimen tallennuksia. Osa testeistä hakee oikean Fristads-tuotesivun ja CDN-kuvan, joten niiden ajaminen vaatii verkon. Käytössä on Chromium sekä työpöytä- ja mobiilikoot. Axe-tarkistukset kattavat tyhjän editorin, muokatun suunnitelman ja ohjeikkunan WCAG A/AA -säännöt; ne eivät korvaa kaikkien apuvälineiden manuaalista testausta.
 
-Viimeisimmässä tarkistuksessa 13 yksikkötestiä ja 27 selain-/API-testiä läpäistiin. Pages-tarkistus avaa myös jokaisen valikoiman kuvatiedoston, testaa tuoteryhmät ja sivutuksen sekä uuden WebP-tuotteen PNG-, PDF- ja JSON-viennin, suunnitelman uudelleen avaamisen ja mobiilinäkymän. Tietoja tuotantopalvelimesta saa paikallisesta `/api/health`-reitistä.
+Viimeisimmässä tarkistuksessa 13 yksikkötestiä ja 26 selain-/API-testiä läpäistiin. Pages-tarkistus avaa myös jokaisen valikoiman kuvatiedoston, testaa tuoteryhmät ja sivutuksen sekä uuden WebP-tuotteen PNG-, PDF- ja JSON-viennin, suunnitelman uudelleen avaamisen ja mobiilinäkymän. Tietoja tuotantopalvelimesta saa paikallisesta `/api/health`-reitistä.

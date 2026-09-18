@@ -84,6 +84,7 @@ try {
   await expect(
     page.getByRole("button", { name: "Painettu ilme", exact: true }),
   ).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: /Poista valkoinen tausta|Remove white background|Ta bort vit bakgrund/i })).toHaveCount(0);
   for (const [name, extension] of [
     ["Lataa esikatselu", ".png"],
     ["Lataa yhteenveto", ".pdf"],

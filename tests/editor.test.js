@@ -1,7 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  removeWhitePixels,
   constrainLogo,
   logoBounds,
   validateDesign,
@@ -25,19 +24,6 @@ const design = {
   view: 0,
   placements: { "100239-940:0": [logo] },
 };
-test("white background removal keeps enclosed white logo details", () => {
-  const data = new Uint8ClampedArray(5 * 5 * 4).fill(255);
-  for (let y = 1; y < 4; y++)
-    for (let x = 1; x < 4; x++)
-      if (x !== 2 || y !== 2) {
-        const i = (y * 5 + x) * 4;
-        data[i] = data[i + 1] = data[i + 2] = 0;
-      }
-  assert.equal(removeWhitePixels(data, 5, 5), 16);
-  assert.equal(data[3], 0);
-  assert.equal(data[(2 * 5 + 2) * 4 + 3], 255);
-  assert.equal(data[(1 * 5 + 1) * 4 + 3], 255);
-});
 test("rotated logos stay fully within the canvas", () => {
   const result = constrainLogo({
       ...logo,
