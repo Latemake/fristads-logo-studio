@@ -9,3 +9,4 @@ data/imported.json
 data/image-cache/
 data/*.tmp
 data/*.log
+data/catalog-cache/

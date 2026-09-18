@@ -391,6 +391,25 @@ h1 > span {
   min-height: 0;
   flex: 1;
 }
+.catalog-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 16px;
+  border-top: 1px solid var(--border, #e2e8da);
+  flex-shrink: 0;
+}
+.catalog-pagination span {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: #52624c;
+}
+.catalog-pagination .btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px;
+}
 .product-card {
   min-width: 0;
   text-align: left;
@@ -1745,6 +1764,20 @@ footer > span:last-child {
 .color-swatches button.active {
   border-color: #355d29;
   box-shadow: 0 0 0 0.07692rem #355d2910;
+}
+.color-swatches button.color-code {
+  width: auto;
+  min-width: 36px;
+  border-radius: 6px;
+  border: 1px solid #d5dfcc;
+  padding: 4px 7px;
+  font-size: 11px;
+  color: #415436;
+  background: #f8faf5;
+}
+.color-swatches button.color-code.active {
+  border-color: #355d29;
+  background: #eaf1e3;
 }
 .copy-layout {
   margin-top: 0.92308rem;

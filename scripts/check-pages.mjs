@@ -1,6 +1,7 @@
 import express from "express";
 import { chromium, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+import sharp from "sharp";
 const app = express();
 app.use("/fristads-logo-studio", express.static("dist-pages"));
 const server = app.listen(3180, "127.0.0.1");
@@ -27,18 +28,49 @@ try {
   const products = JSON.parse(
     await readFile("data/pages-products.json", "utf8"),
   );
-  await expect(page.locator(".product-card")).toHaveCount(products.length);
+  await expect(page.locator(".product-card")).toHaveCount(
+    Math.min(48, products.length),
+  );
   await expect(page.locator(".brand img")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Lisää tuotelinkillä" }),
   ).toHaveCount(0);
-  for (let i = 0; i < products.length; i++) {
-    await page.locator(".product-card").nth(i).click();
+  // Decode every shipped image and verify every variant target, without downloading
+  // thousands of large images into a single browser tab.
+  const ids = new Set(products.map((p) => p.id));
+  for (const p of products)
+    for (const v of p.variants || []) expect(ids.has(v.id)).toBe(true);
+  const images = [...new Set(products.flatMap((p) => p.images))];
+  for (const src of images) {
+    const metadata = await sharp("dist-pages" + src).metadata();
+    expect(metadata.width).toBeGreaterThan(0);
+    expect(metadata.height).toBeGreaterThan(0);
+  }
+  if (products.length > 48) {
+    await page.getByRole("button", { name: "Seuraava sivu" }).click();
+    await expect(page.locator(".product-card").first()).toContainText(
+      products[48].name,
+    );
+    await page.getByRole("button", { name: "Edellinen sivu" }).click();
+  }
+  for (const category of [...new Set(products.map((p) => p.category))]) {
+    await page.getByLabel("Tuoteryhmä").selectOption(category);
+    await expect(page.locator(".product-card")).toHaveCount(
+      Math.min(48, products.filter((p) => p.category === category).length),
+    );
+    await page.locator(".product-card").first().click();
     await expect(
       page.getByRole("button", { name: "Lataa esikatselu" }),
     ).toBeEnabled();
     await expect(page.locator(".canvas-status")).toHaveCount(0);
   }
+  // Export an actual newly imported WebP garment and round-trip its project metadata.
+  const added =
+    products.find((p) => p.images[0].endsWith(".webp")) || products[0];
+  await page.getByLabel("Tuoteryhmä").selectOption("Kaikki");
+  await page.getByLabel("Etsi vaatetta").fill(added.id);
+  await expect(page.locator(".product-card")).toHaveCount(1);
+  await page.locator(".product-card").click();
   await page
     .locator("input[type=file]")
     .first()
@@ -64,6 +96,13 @@ try {
     const download = await pending;
     expect(download.suggestedFilename().endsWith(extension)).toBeTruthy();
     expect((await readFile(await download.path())).length).toBeGreaterThan(100);
+    if (extension === ".json") {
+      await page
+        .locator('input[type="file"]')
+        .nth(1)
+        .setInputFiles(await download.path());
+      await expect(page.locator(".product-info")).toContainText(added.id);
+    }
   }
   await page.reload();
   await expect(page.locator(".logo-row")).toHaveCount(1);

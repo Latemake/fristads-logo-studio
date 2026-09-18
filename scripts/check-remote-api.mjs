@@ -6,6 +6,12 @@ import { build } from "vite";
 
 const origin = "http://127.0.0.1:3180";
 const api = "http://127.0.0.1:3183";
+const bundled = JSON.parse(await readFile("data/products.json", "utf8"));
+const catalog = JSON.parse(await readFile("data/pages-products.json", "utf8"));
+const variant = bundled[0].variants.find(
+  (v) => !bundled.some((p) => p.id === v.id),
+);
+expect(variant).toBeTruthy();
 process.env.VITE_API_URL = api;
 await build({ mode: "pages", build: { outDir: "test-results/remote-pages" } });
 const backend = spawn(
@@ -23,6 +29,11 @@ const backend = spawn(
   },
 );
 const app = express();
+// Exclude this real color from the test snapshot to exercise remote import even
+// when the production snapshot already contains the manufacturer's full range.
+app.get("/fristads-logo-studio/catalog.json", (_, res) =>
+  res.json(catalog.filter((p) => p.id !== variant.id)),
+);
 app.use("/fristads-logo-studio", express.static("test-results/remote-pages"));
 const server = app.listen(3180, "127.0.0.1");
 const browser = await chromium.launch();
@@ -71,14 +82,6 @@ try {
     if (r.url().startsWith(api + "/api/image") && r.ok()) images.push(r.url());
   });
   await page.goto(origin + "/fristads-logo-studio/");
-  const bundled = JSON.parse(await readFile("data/products.json", "utf8"));
-  const catalog = JSON.parse(
-    await readFile("data/pages-products.json", "utf8"),
-  );
-  const variant = bundled[0].variants.find(
-    (v) => !catalog.some((p) => p.id === v.id),
-  );
-  expect(variant).toBeTruthy();
   await page.getByRole("button", { name: "Add by product link" }).click();
   await page.getByLabel("Product link", { exact: true }).fill(variant.url);
   await page.getByRole("button", { name: "Add garment", exact: true }).click();

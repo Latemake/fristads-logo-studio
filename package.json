@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "catalog:sync": "node scripts/sync-catalog.mjs",
     "dev": "node server/index.js",
     "build": "vite build",
     "build:pages": "vite build --mode pages",
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.51.0",
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.6",
+    "sharp": "^0.35.4"
   }
 }

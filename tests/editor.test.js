@@ -89,6 +89,20 @@ test("portable design metadata cannot reference external or executable URLs", ()
     images: ["/garments/100239-940-0.jpg"],
   };
   assert.equal(validateProducts([product])[0].id, product.id);
+  assert.equal(
+    validateProducts([
+      {
+        ...product,
+        images: ["/garments/catalog/0123456789abcdef01234567.webp"],
+      },
+    ])[0].id,
+    product.id,
+  );
+  assert.throws(() =>
+    validateProducts([
+      { ...product, images: ["/garments/catalog/../../secret.webp"] },
+    ]),
+  );
   assert.throws(() =>
     validateProducts([{ ...product, url: "javascript:alert(1)" }]),
   );

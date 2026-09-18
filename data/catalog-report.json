@@ -1,0 +1,28 @@
+{
+  "updatedAt": "2026-09-18T20:04:40.751Z",
+  "source": "https://www.fristads.com/fi-fi/tuotteet",
+  "pages": 26,
+  "discovered": 1413,
+  "total": 1413,
+  "models": 729,
+  "categories": {
+    "T-paidat": 140,
+    "Pikeepaidat": 53,
+    "Paidat": 34,
+    "Hupparit": 33,
+    "Colleget": 99,
+    "Neuleet": 0,
+    "Takit": 273,
+    "Fleecet": 31,
+    "Liivit": 47,
+    "Housut": 343,
+    "Shortsit": 67,
+    "Haalarit": 127,
+    "Alusasut": 18,
+    "Päähineet": 44,
+    "Kengät": 11,
+    "Asusteet": 92,
+    "Muut": 1
+  },
+  "failures": []
+}

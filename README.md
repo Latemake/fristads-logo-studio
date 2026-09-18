@@ -2,6 +2,24 @@
 
 ## Julkinen sivusto
 
+### Koko Suomen verkkokaupan valikoima
+
+Tuotteet haetaan Fristadsin Suomen verkkokaupan julkisesta valikoimasta. Mukana ovat myös verkkokaupan muut tuotemerkit. Malli ja väri muodostavat yhden vaihtoehdon; vaatekoot eivät monista kortteja. `data/catalog-report.json` sisältää viimeisimmän päivitysajan, määrät ja tuoteryhmäkohtaisen kattavuuden.
+
+Valikoima ja optimoidut WebP-tuotekuvat julkaistaan GitHub Pagesissa. Selaaminen, logon muokkaus ja vienti toimivat ilman Renderiä. Tuoteryhmät, nimihaku ja 48 tuotteen sivutus pitävät näkymän kevyenä myös puhelimella. Värin nimi näytetään, kun se tunnetaan; muuten käytetään valmistajan värikoodia. Uusien tuotteiden kuvakulmat tulevat luettelossa saatavilla olevista kuvista, joten kaikilla tuotteilla ei ole neljää kuvakulmaa. Aiemman valikoiman kuvakulmat säilyvät.
+
+Päivitä valikoima ja julkaisu:
+
+```sh
+npm run catalog:sync -- --refresh
+npm run stage:pages
+node scripts/check-pages.mjs
+```
+
+Commitoi ja pushaa tarkistettu `data/`, `public/garments/` ja `docs/` sekä mahdolliset koodimuutokset. Valikoima on päivityshetken tilanne, ei reaaliaikainen varastoluettelo. Haku käyttää Fristadsin ilmoittamaa 10 sekunnin hakuväliä ja pienempiä suodatettuja luetteloita. Julkaistavaa katalogia ei korvata, jos tulosmäärä ei vastaa verkkokaupan ilmoittamaa kokonaismäärää tai jokin kuva puuttuu. Ilman `--refresh`-valitsinta komento jatkaa välimuistista esimerkiksi keskeytyneen kuvalatauksen jälkeen.
+
+Vanha `data/products.json` on pieni regressiotestien aineisto. Paikallinen sovellus käyttää samaa täyttä `data/pages-products.json`-valikoimaa kuin julkinen sivu.
+
 ### Tuotelinkkien tuonti GitHub Pagesissa
 
 GitHub Pages tarvitsee tuotehakua varten erillisen API-palvelun. Käyttöönotto on valmisteltu [Render-asennuslinkillä](https://render.com/deploy?repo=https://github.com/Latemake/fristads-logo-studio). Kirjaudu Renderiin, tarkista ilmainen Free-palvelutaso ja luo palvelu. `render.yaml` määrittää palvelun asetukset; kirjautumistietoja tai API-avaimia ei tallenneta tähän projektiin. Automaattiset palvelinpäivitykset ovat pois käytöstä: julkaise myöhemmät palvelinmuutokset Renderin Manual Deploy -toiminnolla.
@@ -27,7 +45,7 @@ Puhelimella **Valitse kuvista** avaa käyttöjärjestelmän kuvavalitsimen (`acc
 
 GitHub Pages julkaisee `main`-haaran `docs/`-kansion. Päivitä julkaisu komennolla `npm run stage:pages`, testaa `node scripts/check-pages.mjs` ja commitoi sekä pushaa muutokset. Julkinen versio toimii kokonaan selaimessa: logojen muokkaus, automaattitallennus ja PNG-, PDF- sekä JSON-viennit eivät tarvitse palvelinta.
 
-Pages-valikoima on `data/pages-products.json`. `node scripts/prepare-pages.mjs` päivittää sen paikallisesta valikoimasta ja lataa puuttuvat tuotekuvat. Julkisessa versiossa näkyvät vain valmiiksi mukana olevat värivaihtoehdot. Tuotelinkillä tuonti säilyy paikallisessa Express-versiossa, koska GitHub Pages ei suorita palvelinkoodia. Selaimeen tallennetut suunnitelmat ovat sivustokohtaisia: siirrä paikallinen työ julkiselle sivulle JSON-tiedostolla.
+Pages-valikoima on `data/pages-products.json`. `node scripts/prepare-pages.mjs` lisää siihen paikallisesti tuodut tuotteet; koko valikoiman päivitykseen käytetään yllä kuvattua `catalog:sync`-komentoa. Linkkituonti toimii paikallisessa Express-versiossa ja erikseen yhdistetyllä API-palvelulla. Selaimeen tallennetut suunnitelmat ovat sivustokohtaisia: siirrä paikallinen työ julkiselle sivulle JSON-tiedostolla.
 
 Toimiva suomenkielinen työvaatteiden logotyökalu. React + Vite, pieni Express-palvelin. Ei kirjautumista eikä ulkoista tietokantaa.
 
@@ -46,7 +64,7 @@ Tuotantokoonti: `npm run build`, sitten `npm start`. Palvelin kuuntelee oletukse
 
 ## Ominaisuudet
 
-- 24 oikeaa Fristads-vaatevaihtoehtoa ja 87 paikallista tuotekuvaa. Mukana T-paitoja, pikeepaita, viidet housut, neljä takkia, fleece, liivejä, shortseja, huppareita, college ja haalarit. Myös naisten, talvi- ja huomiovaatteita. Haku ja tuoteryhmäkohtaiset määrät.
+- Laaja Fristadsin Suomen verkkokaupan valikoima paikallisine tuotekuvineen. Tuoteryhmät kattavat vaatteet, alusasut, päähineet, jalkineet ja asusteet. Mukana ovat myös naisten, talvi- ja huomiovaatteet. Haku, tuoteryhmäkohtaiset määrät ja sivutus.
 - Muiden tuotteiden ja värien tuonti yksittäisellä Fristads-tuotelinkillä.
 - Tuotesivulta haetut oikeat värivaihtoehdot. Väripainike avaa tutun värin heti tai hakee uuden Fristadsilta. Saman mallin logot voi kopioida toiseen väriin ilman alkuperäisen sommittelun muuttamista.
 - PNG-, JPG-, WebP- ja SVG-logot, raahaaminen, toimivat koonmuutoskahvat, kierto, peittävyys, kopiointi, poisto ja tasojärjestys.
@@ -81,7 +99,7 @@ Tuotantokoonti: `npm run build`, sitten `npm start`. Palvelin kuuntelee oletukse
 - `public/garments`: valmiin valikoiman kuvat.
 - `scripts/seed.mjs`: päivittää mukana tulevan valikoiman Fristadsin tuotesivuilta.
 
-Tuotelinkin tuonti perustuu julkisen tuotesivun rakenteeseen, ei sovittuun Fristads-rajapintaan. Sivuston muutokset voivat vaatia jäsentimen päivityksen. Se tuo yhden tuotteen ja värin kerrallaan; koko Fristads-valikoima ei ole valmiiksi synkronoitu. Pysyvä katalogi-integraatio kannattaa toteuttaa Fristadsin tuotetietosyötteellä. Tuotetietojen hakua on rajattu Fristadsin verkkotunnuksiin, uudelleenohjaukset estetään ja ladattavien tietojen kokoa rajoitetaan.
+Tuotelinkin tuonti ja valikoiman päivitys perustuvat julkisten sivujen rakenteeseen, eivät sovittuun Fristads-rajapintaan. Sivuston muutokset voivat vaatia jäsentimen päivityksen. Linkkituonti tuo yhden tuotteen ja värin; erillinen `catalog:sync` päivittää Suomen verkkokaupan valikoiman. Jatkuva synkronointi kannattaa toteuttaa Fristadsin tuotetietosyötteellä. Tuotetietojen hakua on rajattu Fristadsin verkkotunnuksiin, uudelleenohjaukset estetään ja ladattavien tietojen kokoa rajoitetaan.
 
 Esikatselu on kaksiulotteinen, ei 3D eikä painovalmis tuotantotiedosto. Koko on suhteessa esikatselukuvaan. Varmennetut painatusalueet ja fyysiset mitat vaativat Fristadsin tuotekohtaiset tiedot. Myös sertifioitujen vaatteiden soveltuvat merkintäalueet on sovittava valmistajan kanssa. Käyttöliittymä mukailee Fristadsin brändiä; virallista graafista ohjeistoa ei ole toimitettu. Tuotekuvat ja Fristads-logo ovat Fristadsin aineistoa. Sovi aineiston käyttö ja brändihyväksyntä Fristadsin kanssa ennen julkista julkaisua.
 
@@ -98,4 +116,4 @@ npm run test:e2e
 
 Selaintestit rakentavat ja testaavat oikeaa tuotantoversiota portissa 3100. Testipalvelimen tuonnit ja kuvavälimuisti tallentuvat erilliseen väliaikaishakemistoon: testit eivät muokkaa käyttäjän `data/imported.json`-tiedostoa tai selaimen tallennuksia. Osa testeistä hakee oikean Fristads-tuotesivun ja CDN-kuvan, joten niiden ajaminen vaatii verkon. Käytössä on Chromium sekä työpöytä- ja mobiilikoot. Axe-tarkistukset kattavat tyhjän editorin, muokatun suunnitelman ja ohjeikkunan WCAG A/AA -säännöt; ne eivät korvaa kaikkien apuvälineiden manuaalista testausta.
 
-Viimeisimmässä tarkistuksessa 13 yksikkötestiä ja 21 selain-/API-testiä läpäistiin. PDF-viennistä tarkistetaan oikea PDF-tiedosto ja kahden sommittelun sivumäärä. Tietoja tuotantopalvelimesta saa paikallisesta `/api/health`-reitistä.
+Viimeisimmässä tarkistuksessa 13 yksikkötestiä ja 27 selain-/API-testiä läpäistiin. Pages-tarkistus avaa myös jokaisen valikoiman kuvatiedoston, testaa tuoteryhmät ja sivutuksen sekä uuden WebP-tuotteen PNG-, PDF- ja JSON-viennin, suunnitelman uudelleen avaamisen ja mobiilinäkymän. Tietoja tuotantopalvelimesta saa paikallisesta `/api/health`-reitistä.

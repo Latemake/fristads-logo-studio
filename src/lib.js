@@ -422,6 +422,7 @@ export async function restore() {
 function validProductImage(src) {
   if (typeof src !== "string") return false;
   if (/^\/garments\/\d{6}-\d{3}-\d+\.jpg$/.test(src)) return true;
+  if (/^\/garments\/catalog\/[a-f0-9]{24}\.webp$/.test(src)) return true;
   try {
     const url = new URL(src);
     return (
@@ -435,8 +436,8 @@ function validProductImage(src) {
     return false;
   }
 }
-export function validateProducts(products) {
-  if (!Array.isArray(products) || products.length > 200)
+export function validateProducts(products, limit = 200) {
+  if (!Array.isArray(products) || products.length > limit)
     throw new Error(t("Virheelliset tuotetiedot."));
   return products.map((p) => {
     const url = new URL(p.url);

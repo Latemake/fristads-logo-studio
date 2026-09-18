@@ -54,7 +54,9 @@ async function atomicWrite(file, content) {
   await writeFile(temporary, content);
   await rename(temporary, file);
 }
-const bundled = await readJson(path.join(root, "data/products.json"));
+const bundled = await readJson(
+  path.join(root, process.env.CATALOG_FILE || "data/pages-products.json"),
+);
 app.get("/api/health", (_, res) =>
   res.json({ app: "fristads-logo-studio", status: "ok" }),
 );

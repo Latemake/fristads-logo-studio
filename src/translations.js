@@ -1,6 +1,14 @@
 // Finnish source keys stay stable; product IDs and category filter values are not translated.
 export const translations = Object.fromEntries(
   [
+    ["Alusasut", "Base layers", "Underställ"],
+    ["Neuleet", "Knitwear", "Stickat"],
+    ["Päähineet", "Headwear", "Huvudbonader"],
+    ["Kengät", "Footwear", "Skor"],
+    ["Asusteet", "Accessories", "Tillbehör"],
+    ["Valikoiman sivut", "Catalog pages", "Sortimentets sidor"],
+    ["Edellinen sivu", "Previous page", "Föregående sida"],
+    ["Seuraava sivu", "Next page", "Nästa sida"],
     ["Valitse kuvista", "Choose from photos", "Välj från bilder"],
     ["Tiedosto", "File", "Fil"],
     [

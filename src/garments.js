@@ -4,27 +4,54 @@ export const CATEGORY_ORDER = [
   "Paidat",
   "Hupparit",
   "Colleget",
+  "Neuleet",
   "Takit",
   "Fleecet",
   "Liivit",
   "Housut",
   "Shortsit",
   "Haalarit",
+  "Alusasut",
+  "Päähineet",
+  "Kengät",
+  "Asusteet",
   "Muut",
 ];
 export function classifyGarment(title) {
-  if (/haalari|umpisuoja|coverall/i.test(title)) return "Haalarit";
+  if (
+    /alus(?:paita|housu|asu)|kerrasto|bokseri|underwear|base.?layer/i.test(
+      title,
+    )
+  )
+    return "Alusasut";
+  if (
+    /lippis|lakki|hattu|kypär|pipo|myssy|päähine|huppu(?!llinen)|balaclava|beanie|\bcap\b|\bhat\b/i.test(
+      title,
+    )
+  )
+    return "Päähineet";
+  if (/kenkä|kengät|jalkine|sandaali|saapas|saappaa|shoe|boot/i.test(title))
+    return "Kengät";
+  if (
+    /vyö|vyöt|tasku|pidin|pidike|pitimet|polvisuoj|polvipehmuste|olkai|henkseli|sukka|sukat|käsine|kauluri|huivi|laukku|reppu|pohjalli|vahvike|hihasuoj|bandana|haaranauha|irtolah|esiliina|belt|pocket|glove|sock/i.test(
+      title,
+    ) &&
+    !/housu|takki|liivi|haalari|shortsi/i.test(title)
+  )
+    return "Asusteet";
+  if (/haalari|umpisuoja|avosuoja|coverall|bib/i.test(title)) return "Haalarit";
   if (/liivi|vest/i.test(title)) return "Liivit";
   if (/shortsi|shorts/i.test(title)) return "Shortsit";
   if (/housu|trouser/i.test(title)) return "Housut";
   if (/fleece/i.test(title)) return "Fleecet";
   if (
-    /hupu|huppu|hood/i.test(title) &&
+    /hupu|hupp|hood/i.test(title) &&
     !/softshell|kuori|talvi|airtech/i.test(title)
   )
     return "Hupparit";
   if (/college|sweat/i.test(title)) return "Colleget";
-  if (/takki|jacket/i.test(title)) return "Takit";
+  if (/neule|knitted|pullover/i.test(title)) return "Neuleet";
+  if (/takki|parka|anorakki|jacket/i.test(title)) return "Takit";
   if (/pikee|polo/i.test(title)) return "Pikeepaidat";
   if (/t-paita|t-shirt/i.test(title)) return "T-paidat";
   if (/paita|shirt/i.test(title)) return "Paidat";

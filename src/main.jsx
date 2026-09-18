@@ -78,6 +78,12 @@ function App() {
   const [query, setQuery] = useState(""),
     [category, setCategory] = useState("Kaikki"),
     [toast, setToast] = useState(null);
+  const [catalogPage, setCatalogPage] = useState(0);
+  const catalogGrid = useRef();
+  useEffect(() => {
+    setCatalogPage(0);
+    catalogGrid.current?.scrollTo({ top: 0, left: 0 });
+  }, [query, category]);
   const [dialog, setDialog] = useState(null),
     [url, setUrl] = useState(""),
     [busy, setBusy] = useState(""),
@@ -230,7 +236,7 @@ function App() {
               "Tuotevalikoimaa ei voitu ladata. Tarkista yhteys ja yritä uudelleen.",
             ),
           );
-        const list = validateProducts(await response.json());
+        const list = validateProducts(await response.json(), 10000);
         if (!list.length)
           throw Error(
             t("Valikoima on tyhjä. Tarkista palvelimen tuotetiedot."),
@@ -728,6 +734,16 @@ function App() {
         .toLocaleLowerCase("fi")
         .includes(query.toLocaleLowerCase("fi")),
   );
+  const pageCount = Math.max(1, Math.ceil(filtered.length / 48));
+  const currentPage = Math.min(catalogPage, pageCount - 1);
+  const visibleProducts = filtered.slice(
+    currentPage * 48,
+    (currentPage + 1) * 48,
+  );
+  function turnCatalogPage(delta) {
+    setCatalogPage(Math.max(0, Math.min(pageCount - 1, currentPage + delta)));
+    catalogGrid.current?.scrollTo({ top: 0, left: 0 });
+  }
   const rangeEvents = {
     onPointerDown: begin,
     onPointerUp: finish,
@@ -898,8 +914,8 @@ function App() {
                   <ChevronDown size={14} />
                 </div>
               </div>
-              <div className="product-grid">
-                {filtered.map((p) => (
+              <div className="product-grid" ref={catalogGrid}>
+                {visibleProducts.map((p) => (
                   <button
                     key={p.id}
                     className={
@@ -957,6 +973,37 @@ function App() {
                   </div>
                 )}
               </div>
+              {filtered.length > 48 && (
+                <nav
+                  className="catalog-pagination"
+                  aria-label={t("Valikoiman sivut")}
+                >
+                  <button
+                    className="btn icon-btn"
+                    disabled={currentPage === 0}
+                    aria-label={t("Edellinen sivu")}
+                    onClick={() => turnCatalogPage(-1)}
+                  >
+                    <ChevronRight
+                      size={18}
+                      style={{ transform: "rotate(180deg)" }}
+                    />
+                  </button>
+                  <span aria-live="polite">
+                    {currentPage * 48 + 1}–
+                    {Math.min((currentPage + 1) * 48, filtered.length)} /{" "}
+                    {filtered.length}
+                  </span>
+                  <button
+                    className="btn icon-btn"
+                    disabled={currentPage === pageCount - 1}
+                    aria-label={t("Seuraava sivu")}
+                    onClick={() => turnCatalogPage(1)}
+                  >
+                    <ChevronRight size={18} />
+                  </button>
+                </nav>
+              )}
               {CAN_IMPORT && (
                 <div className="catalog-bottom">
                   <button
@@ -1242,7 +1289,10 @@ function App() {
                             title={productText(v.name)}
                             aria-pressed={v.id === product.id}
                             disabled={!!busy}
-                            className={v.id === product.id ? "active" : ""}
+                            className={
+                              (v.id === product.id ? "active " : "") +
+                              (/^\d{3}$/.test(v.name) ? "color-code" : "")
+                            }
                             style={{
                               "--swatch":
                                 v.colors.length === 2
@@ -1257,7 +1307,7 @@ function App() {
                               else importProduct(null, v.url);
                             }}
                           >
-                            <span />
+                            {/^\d{3}$/.test(v.name) ? v.name : <span />}
                           </button>
                         ))}
                       {busy === "import" && (

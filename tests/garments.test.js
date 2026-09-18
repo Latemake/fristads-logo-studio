@@ -11,6 +11,19 @@ test("garment categories distinguish hoodies, vests, fleece, shorts and overalls
     ["Stretch shortsit", "Shortsit"],
     ["Green umpihaalari", "Haalarit"],
     ["Airtech talvihousut", "Housut"],
+    ["Flamestat alushousut 7466 MOFN", "Alusasut"],
+    ["Palosuojatut Flamestat sukat", "Asusteet"],
+    ["Snikki työkaluvyö", "Asusteet"],
+    ["Puhdastilahuppu", "Päähineet"],
+    ["Kolhulippis", "Päähineet"],
+    ["Fristads ComfortStep turvakengät", "Kengät"],
+    ["Acode neulepusero", "Neuleet"],
+    ["High vis avosuoja", "Haalarit"],
+    ["Flamestat stretch huppari", "Hupparit"],
+    ["High vis talviparka", "Takit"],
+    ["Flamestat bokserit", "Alusasut"],
+    ["Puhdastila lippalakki", "Päähineet"],
+    ["Snikki yleismittarin pidike", "Asusteet"],
   ])
     assert.equal(classifyGarment(name), category);
 });
