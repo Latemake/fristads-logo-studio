@@ -1,5 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { fetchLimited, allowedImage } from "../server/catalog.js";
+import { singleItemCatalog } from "../src/catalog-policy.js";
 const bundled = JSON.parse(await readFile("data/products.json", "utf8"));
 const existing = JSON.parse(
   await readFile("data/pages-products.json", "utf8").catch(() => "[]"),
@@ -7,11 +8,11 @@ const existing = JSON.parse(
 const imported = JSON.parse(
   await readFile("data/imported.json", "utf8").catch(() => "[]"),
 );
-const products = [
+const products = singleItemCatalog([
   ...new Map(
     [...existing, ...imported, ...bundled].map((p) => [p.id, p]),
   ).values(),
-];
+]);
 for (const product of products) {
   const originals = [...product.images];
   product.images = await Promise.all(

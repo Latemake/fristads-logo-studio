@@ -8,6 +8,7 @@ import {
   validateProductUrl,
 } from "../server/catalog.js";
 import { classifyGarment, CATEGORY_ORDER } from "../src/garments.js";
+import { isMultiItemProduct } from "../src/catalog-policy.js";
 
 const cache = "data/catalog-cache";
 await mkdir(cache, { recursive: true });
@@ -317,6 +318,12 @@ if (failures.length)
   );
 // Retain existing garments so saved designs and their view indexes stay valid.
 for (const p of original) if (!products.has(p.id)) output.push(p);
+const excluded = output
+  .filter(isMultiItemProduct)
+  .map(({ id, name }) => ({ id, name }));
+for (let index = output.length - 1; index >= 0; index--) {
+  if (isMultiItemProduct(output[index])) output.splice(index, 1);
+}
 const ids = new Set(output.map((p) => p.id));
 for (const p of output) p.variants = p.variants.filter((v) => ids.has(v.id));
 const priority = new Map(original.map((p, index) => [p.id, index]));
@@ -337,6 +344,7 @@ const report = {
   source: "https://www.fristads.com/fi-fi/tuotteet",
   pages: sources.size,
   discovered: products.size,
+  excluded,
   total: output.length,
   models: new Set(output.map((p) => p.id.slice(0, 6))).size,
   categories: Object.fromEntries(

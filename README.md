@@ -6,6 +6,8 @@
 
 Tuotteet haetaan Fristadsin Suomen verkkokaupan julkisesta valikoimasta. Mukana ovat myös verkkokaupan muut tuotemerkit. Malli ja väri muodostavat yhden vaihtoehdon; vaatekoot eivät monista kortteja. `data/catalog-report.json` sisältää viimeisimmän päivitysajan, määrät ja tuoteryhmäkohtaisen kattavuuden.
 
+Monipakkaukset ja usean vaatteen setit rajataan pois suunnitteluvalikoimasta. Sääntö on tiedostossa `src/catalog-policy.js`, ja se koskee myös myöhempiä katalogipäivityksiä. Raportin `discovered` kertoo lähdevalikoiman koon, `excluded` poistetut setit ja `total` näkyvän valikoiman koon. `node scripts/filter-catalog.mjs` päivittää rajauksen nykyiseen katalogiin ilman uutta verkkohakua.
+
 Valikoima ja optimoidut WebP-tuotekuvat julkaistaan GitHub Pagesissa. Selaaminen, logon muokkaus ja vienti toimivat ilman Renderiä. Tuoteryhmät, nimihaku ja 48 tuotteen sivutus pitävät näkymän kevyenä myös puhelimella. Värin nimi näytetään, kun se tunnetaan; muuten käytetään valmistajan värikoodia. Uusien tuotteiden kuvakulmat tulevat luettelossa saatavilla olevista kuvista, joten kaikilla tuotteilla ei ole neljää kuvakulmaa. Aiemman valikoiman kuvakulmat säilyvät.
 
 Päivitä valikoima ja julkaisu:

@@ -3,8 +3,8 @@
   "source": "https://www.fristads.com/fi-fi/tuotteet",
   "pages": 26,
   "discovered": 1413,
-  "total": 1413,
-  "models": 729,
+  "total": 1405,
+  "models": 721,
   "categories": {
     "T-paidat": 140,
     "Pikeepaidat": 53,
@@ -18,11 +18,46 @@
     "Housut": 343,
     "Shortsit": 67,
     "Haalarit": 127,
-    "Alusasut": 18,
+    "Alusasut": 16,
     "Päähineet": 44,
     "Kengät": 11,
-    "Asusteet": 92,
-    "Muut": 1
+    "Asusteet": 87,
+    "Muut": 0
   },
-  "failures": []
+  "failures": [],
+  "filteredAt": "2026-09-18T20:16:38.832Z",
+  "excluded": [
+    {
+      "id": "127382-940",
+      "name": "Alusasu 7416 UE"
+    },
+    {
+      "id": "125034-940",
+      "name": "Bokserit 3-pack, 9329 BOX"
+    },
+    {
+      "id": "122114-940",
+      "name": "Henkilökorttipidin 9130 P159 5 kpl pakkaus"
+    },
+    {
+      "id": "100550-940",
+      "name": "Henkilökorttipidin 993 PST, 10-pakkaus"
+    },
+    {
+      "id": "100646-900",
+      "name": "Puhdastilasukat 6R013 XF85 - 6 paria/ pakkaus"
+    },
+    {
+      "id": "127543-940",
+      "name": "Sukat 2-paria 9186 SOC"
+    },
+    {
+      "id": "126906-940",
+      "name": "Villasukat 2-paria 9168 SOW"
+    },
+    {
+      "id": "127566-940",
+      "name": "Sadeasusetti 4099 LRS"
+    }
+  ]
 }
