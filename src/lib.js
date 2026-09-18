@@ -1,11 +1,13 @@
 import { t } from "./i18n.js";
 import { printedLogo } from "./printed.js";
-import { STATIC_SITE, BASE_URL } from "./runtime.js";
+import { STATIC_SITE, BASE_URL, API_BASE } from "./runtime.js";
 export const MAX_LOGOS = 20;
 export const MAX_TOTAL_LOGOS = 200;
 export const imageSrc = (src) => {
   if (src?.startsWith("https:"))
-    return STATIC_SITE ? src : "/api/image?url=" + encodeURIComponent(src);
+    return STATIC_SITE && !API_BASE
+      ? src
+      : API_BASE + "/api/image?url=" + encodeURIComponent(src);
   return src?.startsWith("/") ? BASE_URL + src.slice(1) : src;
 };
 export const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
@@ -21,8 +23,7 @@ export const allLogos = (design) => Object.values(design.placements).flat();
 export function loadImage(src) {
   return new Promise((resolve, reject) => {
     const image = new Image();
-    if (STATIC_SITE && src.startsWith("https:"))
-      image.crossOrigin = "anonymous";
+    if (STATIC_SITE && /^https?:/.test(src)) image.crossOrigin = "anonymous";
     image.onload = () => resolve(image);
     image.onerror = () =>
       reject(

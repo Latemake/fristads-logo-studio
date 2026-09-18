@@ -14,6 +14,27 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const storage = path.resolve(root, process.env.DATA_DIR || "data");
 const app = express();
 app.disable("x-powered-by");
+const allowedOrigins = new Set(
+  (process.env.ALLOWED_ORIGINS || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean),
+);
+app.use("/api", (req, res, next) => {
+  res.vary("Origin");
+  const origin = req.get("Origin");
+  const ownOrigin = `${req.protocol}://${req.get("host")}`;
+  if (origin && origin !== ownOrigin) {
+    if (!allowedOrigins.has(origin))
+      return res.status(403).json({ error: "Origin not allowed." });
+    res.set("Access-Control-Allow-Origin", origin);
+    res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+    res.set("Access-Control-Max-Age", "600");
+  }
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
 app.use(express.json({ limit: "10kb" }));
 app.use((req, res, next) => {
   res.set("X-Content-Type-Options", "nosniff");
@@ -51,6 +72,7 @@ app.post("/api/products/import", async (req, res) => {
       { buffer } = await fetchLimited(url),
       remote = parseProduct(buffer.toString("utf8"), url);
     const product = bundled.find((p) => p.id === remote.id) || remote;
+    if (process.env.PERSIST_IMPORTS === "false") return res.json(product);
     pendingWrite = pendingWrite
       .catch(() => {})
       .then(async () => {
@@ -64,14 +86,12 @@ app.post("/api/products/import", async (req, res) => {
     await pendingWrite;
     res.json(product);
   } catch (error) {
-    res
-      .status(400)
-      .json({
-        error:
-          error.name === "TimeoutError"
-            ? "Fristadsin sivu ei vastannut ajoissa. Yritä uudelleen."
-            : error.message,
-      });
+    res.status(400).json({
+      error:
+        error.name === "TimeoutError"
+          ? "Fristadsin sivu ei vastannut ajoissa. Yritä uudelleen."
+          : error.message,
+    });
   }
 });
 function imageType(buffer) {
@@ -138,16 +158,16 @@ app.use("/api", (_, res) =>
 );
 app.use((error, req, res, next) => {
   if (!error) return next();
-  res
-    .status(error.status || 500)
-    .json({
-      error:
-        error.type === "entity.too.large"
-          ? "Pyyntö on liian suuri."
-          : "Virheellinen pyyntö. Tarkista tiedot.",
-    });
+  res.status(error.status || 500).json({
+    error:
+      error.type === "entity.too.large"
+        ? "Pyyntö on liian suuri."
+        : "Virheellinen pyyntö. Tarkista tiedot.",
+  });
 });
-if (process.argv.includes("--production")) {
+if (process.env.API_ONLY === "true") {
+  app.use((_, res) => res.status(404).json({ error: "Not found." }));
+} else if (process.argv.includes("--production")) {
   app.use(express.static(path.join(root, "dist")));
   app.get("/{*path}", (_, res) =>
     res.sendFile(path.join(root, "dist/index.html")),
@@ -161,8 +181,11 @@ if (process.argv.includes("--production")) {
   });
   app.use(vite.middlewares);
 }
-app.listen(Number(process.env.PORT || 3000), "127.0.0.1", () =>
-  console.log(
-    "Fristads Logo Studio: http://localhost:" + (process.env.PORT || 3000),
-  ),
+app.listen(
+  Number(process.env.PORT || 3000),
+  process.env.HOST || "127.0.0.1",
+  () =>
+    console.log(
+      "Fristads Logo Studio: http://localhost:" + (process.env.PORT || 3000),
+    ),
 );

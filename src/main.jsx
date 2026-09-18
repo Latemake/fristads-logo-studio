@@ -61,7 +61,7 @@ import {
 import { useDesign } from "./useDesign";
 import { Modal } from "./Modal";
 import { CATEGORY_ORDER, garmentPlacement } from "./garments";
-import { STATIC_SITE, BASE_URL } from "./runtime";
+import { STATIC_SITE, BASE_URL, API_BASE, CAN_IMPORT } from "./runtime";
 import "./style.css";
 
 const NONE = [];
@@ -596,11 +596,11 @@ function App() {
     setBusy("import");
     setError("");
     try {
-      const response = await fetch("/api/products/import", {
+      const response = await fetch(API_BASE + "/api/products/import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: productUrl }),
-        signal: AbortSignal.timeout(45000),
+        signal: AbortSignal.timeout(90000),
       });
       const body = await response.json();
       if (!response.ok)
@@ -911,6 +911,9 @@ function App() {
                     <div className="product-photo">
                       <img
                         src={imageSrc(p.images[0])}
+                        crossOrigin={
+                          STATIC_SITE && API_BASE ? "anonymous" : undefined
+                        }
                         alt={productText(p.name)}
                         loading="lazy"
                       />
@@ -954,7 +957,7 @@ function App() {
                   </div>
                 )}
               </div>
-              {!STATIC_SITE && (
+              {CAN_IMPORT && (
                 <div className="catalog-bottom">
                   <button
                     className="btn full"
@@ -1183,7 +1186,13 @@ function App() {
                       onClick={() => chooseView(i)}
                       aria-label={t("Kuvakulma {0}", [i + 1])}
                     >
-                      <img src={imageSrc(src)} alt="" />
+                      <img
+                        src={imageSrc(src)}
+                        crossOrigin={
+                          STATIC_SITE && API_BASE ? "anonymous" : undefined
+                        }
+                        alt=""
+                      />
                       <span>
                         {t("Kuva") + " "}
                         {i + 1}
@@ -1224,7 +1233,7 @@ function App() {
                       {product.variants
                         .filter(
                           (v) =>
-                            !STATIC_SITE || products.some((p) => p.id === v.id),
+                            CAN_IMPORT || products.some((p) => p.id === v.id),
                         )
                         .map((v) => (
                           <button
@@ -1764,7 +1773,7 @@ function App() {
               <strong>{t("Valitse vaate.")}</strong>
               {" " +
                 t(
-                  STATIC_SITE
+                  !CAN_IMPORT
                     ? "Selaa valikoimaa ja valitse vaate sekä väri."
                     : "Selaa valikoimaa tai lisää haluamasi tuote ja väri Fristads-tuotelinkillä.",
                 ) +

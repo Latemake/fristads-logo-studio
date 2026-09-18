@@ -2,6 +2,23 @@
 
 ## Julkinen sivusto
 
+### Tuotelinkkien tuonti GitHub Pagesissa
+
+GitHub Pages tarvitsee tuotehakua varten erillisen API-palvelun. Käyttöönotto on valmisteltu [Render-asennuslinkillä](https://render.com/deploy?repo=https://github.com/Latemake/fristads-logo-studio). Kirjaudu Renderiin, tarkista ilmainen Free-palvelutaso ja luo palvelu. `render.yaml` määrittää palvelun asetukset; kirjautumistietoja tai API-avaimia ei tallenneta tähän projektiin. Automaattiset palvelinpäivitykset ovat pois käytöstä: julkaise myöhemmät palvelinmuutokset Renderin Manual Deploy -toiminnolla.
+
+Kun palvelu näyttää Live ja sen julkinen HTTPS-osoite on tiedossa:
+
+```sh
+node scripts/connect-api.mjs https://OMA-PALVELU.onrender.com
+npm run stage:pages
+```
+
+Yhdistämisskripti tarkistaa palvelun toiminnan ja GitHub Pagesin sallitun alkuperän ennen asetuksen tallentamista `data/deployment.json`-tiedostoon. Julkaise tämän jälkeen asetustiedosto ja `docs/` GitHubiin. Tuontipainike tulee näkyviin vasta, kun API on määritetty. Tyhjä `apiUrl` säilyttää aiemman pelkästään staattisen version. Julkiseen versioon ei ole vielä määritetty API-osoitetta.
+
+Palvelu hakee vain Fristads-tuotetietoja ja sallittuja tuotekuvia. Logot ja käyttäjän suunnitelma pysyvät selaimessa. Tuodut tuotetiedot tallentuvat suunnitelmaan; Renderin väliaikainen levy toimii vain uudelleen haettavien kuvien välimuistina. `ALLOWED_ORIGINS` rajaa selaimesta tehtävät API-pyynnöt nykyiseen GitHub Pages -alkuperään.
+
+`node scripts/check-remote-api.mjs` testaa erillisen palvelimen kanssa oikean Fristads-tuotteen tuonnin, kuvavälityksen, PNG-viennin, tallennuksen ja CORS-rajoituksen. Testi rakentaa oman version `test-results/`-hakemistoon. Alla mainittu `check-pages.mjs` tarkistaa staattisen version ilman määritettyä API:a.
+
 [Avaa Logo Studio](https://latemake.github.io/fristads-logo-studio/)
 
 Käyttöliittymässä on kolme kieltä: English (oletus), Suomi ja Svenska. Valinta tallentuu selaimeen. Kielenvaihto ei muuta suunnitelmaa, tuotetunnuksia tai käyttäjän kirjoittamaa nimeä. Käännökset ovat tiedostoissa `src/translations.js` ja `src/product-translations.js`; PDF-yhteenvedot käyttävät valittua kieltä.

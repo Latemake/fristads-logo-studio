@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: fristads-logo-studio-api
+    runtime: node
+    plan: free
+    autoDeployTrigger: off
+    buildCommand: npm ci --omit=dev
+    startCommand: node server/index.js --production
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 24.13.1
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: API_ONLY
+        value: "true"
+      - key: PERSIST_IMPORTS
+        value: "false"
+      - key: ALLOWED_ORIGINS
+        value: https://latemake.github.io
